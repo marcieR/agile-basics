@@ -12,37 +12,37 @@ in a Nutshell
 ​
 https://www.youtube.com/watch?v=502ILHjX9EE&t=2s
 
-Daily Standup​
+# Daily Standup​
+Time Allocated:​ 
+#Who Attends:​
+Purpose:​
+Outcome:
+
+# Sprint Planning​
 Time Allocated:​ 
 Who Attends:​
 Purpose:​
 Outcome:
 
-Sprint Planning​
+# Backlog Refinement​
 Time Allocated:​ 
 Who Attends:​
 Purpose:​
 Outcome:
 
-Backlog Refinement​
+# Retrospective​
 Time Allocated:​ 
 Who Attends:​
 Purpose:​
 Outcome:
 
-Retrospective​
+# Decomposition​
 Time Allocated:​ 
 Who Attends:​
 Purpose:​
 Outcome:
 
-Decomposition​
-Time Allocated:​ 
-Who Attends:​
-Purpose:​
-Outcome:
-
-Story Hydration​
+# Story Hydration​
 Time Allocated:​ 
 Who Attends:​
 Purpose:​
