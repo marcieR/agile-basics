@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Principles behind the Agile Manifesto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --accent1: #6366f1;
+    --accent2: #22d3ee;
+    --accent3: #f472b6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34,211,238,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 50%, rgba(244,114,182,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 80px 24px 60px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(34,211,238,0.1);
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 100px;
+    padding: 6px 18px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent1) 70%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    z-index: 100;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    width: 0%;
+    transition: width 0.1s;
+  }
+
+  /* Grid */
+  .grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+
+  .card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-num::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--c), transparent);
+    opacity: 0.3;
+  }
+
+  .card-num .num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--c);
+    flex-shrink: 0;
+  }
+
+  .card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+    font-weight: 300;
+  }
+
+  .card .icon {
+    position: absolute;
+    bottom: 20px;
+    right: 24px;
+    font-size: 2.5rem;
+    opacity: 0.12;
+    transition: opacity 0.3s, transform 0.3s;
+    user-select: none;
+  }
+
+  .card:hover .icon {
+    opacity: 0.25;
+    transform: scale(1.2) rotate(-5deg);
+  }
+
+  /* Color themes per card */
+  .c1  { --c: #6366f1; --glow: radial-gradient(ellipse at 0% 0%, rgba(99,102,241,0.08), transparent 70%); }
+  .c2  { --c: #22d3ee; --glow: radial-gradient(ellipse at 100% 0%, rgba(34,211,238,0.08), transparent 70%); }
+  .c3  { --c: #f472b6; --glow: radial-gradient(ellipse at 0% 100%, rgba(244,114,182,0.08), transparent 70%); }
+  .c4  { --c: #34d399; --glow: radial-gradient(ellipse at 100% 100%, rgba(52,211,153,0.08), transparent 70%); }
+  .c5  { --c: #fbbf24; --glow: radial-gradient(ellipse at 0% 0%, rgba(251,191,36,0.08), transparent 70%); }
+  .c6  { --c: #a78bfa; --glow: radial-gradient(ellipse at 100% 0%, rgba(167,139,250,0.08), transparent 70%); }
+  .c7  { --c: #fb923c; --glow: radial-gradient(ellipse at 0% 100%, rgba(251,146,60,0.08), transparent 70%); }
+  .c8  { --c: #38bdf8; --glow: radial-gradient(ellipse at 100% 100%, rgba(56,189,248,0.08), transparent 70%); }
+  .c9  { --c: #e879f9; --glow: radial-gradient(ellipse at 0% 0%, rgba(232,121,249,0.08), transparent 70%); }
+  .c10 { --c: #4ade80; --glow: radial-gradient(ellipse at 100% 0%, rgba(74,222,128,0.08), transparent 70%); }
+  .c11 { --c: #f87171; --glow: radial-gradient(ellipse at 0% 100%, rgba(248,113,113,0.08), transparent 70%); }
+  .c12 { --c: #67e8f9; --glow: radial-gradient(ellipse at 100% 100%, rgba(103,232,249,0.08), transparent 70%); }
+
+  /* Featured card spans 2 cols */
+  .featured {
+    grid-column: span 2;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(34,211,238,0.08));
+    border-color: rgba(99,102,241,0.3);
+  }
+  @media (max-width: 700px) { .featured { grid-column: span 1; } }
+
+  .featured p {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #e2e8f0;
+  }
+
+  /* Fade-in animation */
+  .card {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  footer a { color: var(--accent2); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="progress-wrap"><div class="progress-bar" id="pb"></div></div>
+
+<header>
+  <div class="eyebrow">Agile Manifesto</div>
+  <h1>12 Principles of<br>Agile Development</h1>
+  <p class="subtitle">The foundational beliefs that guide how great software teams think, collaborate, and deliver.</p>
+</header>
+
+<div class="grid">
+
+  <div class="card featured c1" style="animation-delay:0.05s">
+    <div class="card-num"><span class="num">1</span> Customer Satisfaction</div>
+    <p>Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.</p>
+    <span class="icon">🏆</span>
+  </div>
+
+  <div class="card c2" style="animation-delay:0.1s">
+    <div class="card-num"><span class="num">2</span> Welcome Change</div>
+    <p>Welcome changing requirements, even late in development. Agile processes harness change for the customer's competitive advantage.</p>
+    <span class="icon">🔄</span>
+  </div>
+
+  <div class="card c3" style="animation-delay:0.15s">
+    <div class="card-num"><span class="num">3</span> Frequent Delivery</div>
+    <p>Deliver working software frequently, from a couple of weeks to a couple of months, with a preference to the shorter timescale.</p>
+    <span class="icon">🚀</span>
+  </div>
+
+  <div class="card c4" style="animation-delay:0.2s">
+    <div class="card-num"><span class="num">4</span> Collaborate Daily</div>
+    <p>Business people and developers must work together daily throughout the project.</p>
+    <span class="icon">🤝</span>
+  </div>
+
+  <div class="card c5" style="animation-delay:0.25s">
+    <div class="card-num"><span class="num">5</span> Motivated Individuals</div>
+    <p>Build projects around motivated individuals. Give them the environment and support they need, and trust them to get the job done.</p>
+    <span class="icon">💪</span>
+  </div>
+
+  <div class="card c6" style="animation-delay:0.3s">
+    <div class="card-num"><span class="num">6</span> Face-to-Face</div>
+    <p>The most efficient and effective method of conveying information to and within a development team is face-to-face conversation.</p>
+    <span class="icon">💬</span>
+  </div>
+
+  <div class="card c7" style="animation-delay:0.35s">
+    <div class="card-num"><span class="num">7</span> Working Software</div>
+    <p>Working software is the primary measure of progress.</p>
+    <span class="icon">✅</span>
+  </div>
+
+  <div class="card c8" style="animation-delay:0.4s">
+    <div class="card-num"><span class="num">8</span> Sustainable Pace</div>
+    <p>Agile processes promote sustainable development. The sponsors, developers, and users should be able to maintain a constant pace indefinitely.</p>
+    <span class="icon">⏱️</span>
+  </div>
+
+  <div class="card c9" style="animation-delay:0.45s">
+    <div class="card-num"><span class="num">9</span> Technical Excellence</div>
+    <p>Continuous attention to technical excellence and good design enhances agility.</p>
+    <span class="icon">⚙️</span>
+  </div>
+
+  <div class="card c10" style="animation-delay:0.5s">
+    <div class="card-num"><span class="num">10</span> Simplicity</div>
+    <p>Simplicity — the art of maximizing the amount of work not done — is essential.</p>
+    <span class="icon">🎯</span>
+  </div>
+
+  <div class="card c11" style="animation-delay:0.55s">
+    <div class="card-num"><span class="num">11</span> Self-Organizing Teams</div>
+    <p>The best architectures, requirements, and designs emerge from self-organizing teams.</p>
+    <span class="icon">🌐</span>
+  </div>
+
+  <div class="card c12" style="animation-delay:0.6s">
+    <div class="card-num"><span class="num">12</span> Reflect & Adapt</div>
+    <p>At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior accordingly.</p>
+    <span class="icon">🔍</span>
+  </div>
+
+</div>
+
+<footer>
+  Based on the original <a href="https://agilemanifesto.org/principles.html" target="_blank">Agile Manifesto Principles</a> — © 2001, the authors.
+</footer>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('pb').style.width = pct + '%';
+  });
+</script>
+</body>
+</html>
