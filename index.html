@@ -7,14 +7,10 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root { --bg: #0a0e1a; --card: #111827; --text: #e2e8f0; --muted: #64748b; }
-
   body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
-
   body::before {
-    content: '';
-    position: fixed; inset: 0;
+    content: ''; position: fixed; inset: 0;
     background:
       radial-gradient(ellipse 70% 50% at 10% 20%, rgba(99,102,241,0.13) 0%, transparent 60%),
       radial-gradient(ellipse 60% 40% at 90% 80%, rgba(34,211,238,0.1) 0%, transparent 60%);
@@ -24,15 +20,8 @@
   .prog-wrap { position: fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.05); z-index:100; }
   .prog-bar { height:100%; background: linear-gradient(90deg,#6366f1,#22d3ee); width:0%; transition:width .1s; }
 
-  .nav-dots {
-    position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
-    z-index: 50; display: flex; flex-direction: column; gap: 10px;
-  }
-  .nav-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(255,255,255,0.2); cursor: pointer; border: none;
-    transition: background 0.3s, transform 0.3s;
-  }
+  .nav-dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 50; display: flex; flex-direction: column; gap: 10px; }
+  .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); cursor: pointer; border: none; transition: background 0.3s, transform 0.3s; }
   .nav-dot.active { background: #22d3ee; transform: scale(1.5); }
 
   header { position: relative; z-index:1; text-align: center; padding: 90px 24px 60px; }
@@ -56,15 +45,14 @@
   }
   .tl-item { display: flex; align-items: center; gap: 0; cursor: pointer; }
   .tl-badge {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 10px 16px; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; padding: 10px 14px; border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04);
     transition: background 0.3s, border-color 0.3s, transform 0.3s; white-space: nowrap;
   }
   .tl-badge:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); transform: translateY(-3px); }
-  .tl-badge .tl-icon { font-size: 1.4rem; margin-bottom:4px; }
-  .tl-badge .tl-label { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
-  .tl-line { width: 32px; height: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); flex-shrink:0; }
+  .tl-badge .tl-icon { font-size: 1.3rem; margin-bottom:4px; }
+  .tl-badge .tl-label { font-size:9px; font-weight:600; letter-spacing:1px; text-transform:uppercase; }
+  .tl-line { width: 24px; height: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05)); flex-shrink:0; }
 
   /* Sections */
   .section {
@@ -72,7 +60,6 @@
     opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease;
   }
   .section.visible { opacity:1; transform:translateY(0); }
-
   .section-inner { border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; background: var(--card); }
 
   .section-header {
@@ -85,7 +72,7 @@
 
   .meta-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 22px 44px; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .pill {
-    display: flex; align-items: center; gap: 7px;
+    display: flex; align-items: center; gap: 6px;
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
     border-radius: 100px; padding: 7px 14px; font-size: 0.82rem;
   }
@@ -94,15 +81,14 @@
   .section-body { display: grid; grid-template-columns: 1fr 1fr; }
   @media (max-width: 700px) {
     .section-body { grid-template-columns: 1fr; }
-    .section-header, .meta-row, .purpose-col, .tip-col { padding-left: 22px !important; padding-right: 22px !important; }
+    .section-header, .meta-row, .purpose-col, .tip-col, .pitfall-wrap { padding-left: 22px !important; padding-right: 22px !important; }
     .section-header { flex-direction: column; }
+    .purpose-col { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
   }
 
   .purpose-col { padding: 28px 44px; border-right: 1px solid rgba(255,255,255,0.06); }
   .tip-col { padding: 28px 44px; }
-
   .col-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 14px; color: var(--c); }
-
   .purpose-col p { color: #cbd5e1; line-height: 1.8; font-size: 0.93rem; font-weight: 300; }
 
   .tip-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 20px; }
@@ -121,14 +107,61 @@
     background: var(--cb); color: var(--c);
   }
 
-  /* Outcome badge */
   .outcome {
-    margin-top: 20px; padding: 14px 18px;
-    border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.03);
+    margin-top: 16px; padding: 14px 18px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
     font-size: 0.85rem; color: #94a3b8; line-height: 1.6;
   }
   .outcome strong { color: var(--c); display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+
+  /* Pitfall section */
+  .pitfall-wrap {
+    padding: 0 44px 36px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .pitfall-box {
+    border-radius: 18px;
+    border: 1px solid rgba(251,113,133,0.3);
+    background: rgba(251,113,133,0.05);
+    overflow: hidden;
+  }
+  .pitfall-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 26px 16px;
+    border-bottom: 1px solid rgba(251,113,133,0.15);
+  }
+  .pitfall-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: rgba(251,113,133,0.15); display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .pitfall-header h3 { font-size: 1rem; font-weight: 700; color: #fb7185; margin-bottom: 2px; }
+  .pitfall-header p { font-size: 0.8rem; color: var(--muted); }
+  .pitfall-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media (max-width: 700px) { .pitfall-body { grid-template-columns: 1fr; } }
+  .pitfall-col { padding: 20px 26px; }
+  .pitfall-col:first-child { border-right: 1px solid rgba(251,113,133,0.15); }
+  .pitfall-col-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #fb7185; margin-bottom: 10px; }
+  .pitfall-col p { font-size: 0.87rem; color: #94a3b8; line-height: 1.75; font-weight: 300; }
+
+  .conformity-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(251,113,133,0.12); border: 1px solid rgba(251,113,133,0.25);
+    color: #fb7185; border-radius: 100px; padding: 4px 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .fix-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .fix-list li {
+    display: flex; align-items: flex-start; gap: 9px;
+    font-size: 0.85rem; color: #94a3b8; line-height: 1.6;
+  }
+  .fix-dot {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+    background: rgba(52,211,153,0.15); color: #34d399;
+    display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;
+  }
 
   /* Resource link */
   .resource-link {
@@ -143,16 +176,19 @@
   /* Color variants */
   .s1 { --c: #6366f1; --cb: rgba(99,102,241,0.15); }
   .s2 { --c: #22d3ee; --cb: rgba(34,211,238,0.15); }
-  .s3 { --c: #a78bfa; --cb: rgba(167,139,250,0.15); }
-  .s4 { --c: #fb923c; --cb: rgba(251,146,60,0.15); }
-  .s5 { --c: #f472b6; --cb: rgba(244,114,182,0.15); }
-  .s6 { --c: #34d399; --cb: rgba(52,211,153,0.15); }
+  .s3 { --c: #fbbf24; --cb: rgba(251,191,36,0.15); }
+  .s4 { --c: #a78bfa; --cb: rgba(167,139,250,0.15); }
+  .s5 { --c: #fb923c; --cb: rgba(251,146,60,0.15); }
+  .s6 { --c: #f472b6; --cb: rgba(244,114,182,0.15); }
+  .s7 { --c: #34d399; --cb: rgba(52,211,153,0.15); }
 
   footer {
     position: relative; z-index:1; text-align: center;
     padding: 40px 24px; border-top: 1px solid rgba(255,255,255,0.05);
     color: var(--muted); font-size: 0.85rem;
   }
+  footer a { text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -163,6 +199,7 @@
   <button class="nav-dot active" title="Top"></button>
   <button class="nav-dot" title="Sprint Planning"></button>
   <button class="nav-dot" title="Daily Stand-up"></button>
+  <button class="nav-dot" title="Backlog Refinement"></button>
   <button class="nav-dot" title="Story Hydration"></button>
   <button class="nav-dot" title="Decomposition"></button>
   <button class="nav-dot" title="Sprint Review"></button>
@@ -171,7 +208,7 @@
 
 <header>
   <div class="eyebrow">Scrum Framework</div>
-  <h1>The Six Scrum<br>Ceremonies</h1>
+  <h1>The Seven Scrum<br>Ceremonies</h1>
   <p class="subtitle">The meetings that keep agile teams aligned, accountable, and continuously improving — sprint after sprint.</p>
 </header>
 
@@ -186,18 +223,22 @@
   </div>
   <div class="tl-line"></div>
   <div class="tl-item" onclick="scrollToSection(2)">
-    <div class="tl-badge"><span class="tl-icon">💧</span><span class="tl-label" style="color:#a78bfa">Story Hydration</span></div>
+    <div class="tl-badge"><span class="tl-icon">🗂️</span><span class="tl-label" style="color:#fbbf24">Refinement</span></div>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item" onclick="scrollToSection(3)">
-    <div class="tl-badge"><span class="tl-icon">🧩</span><span class="tl-label" style="color:#fb923c">Decomposition</span></div>
+    <div class="tl-badge"><span class="tl-icon">💧</span><span class="tl-label" style="color:#a78bfa">Story Hydration</span></div>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item" onclick="scrollToSection(4)">
-    <div class="tl-badge"><span class="tl-icon">🎯</span><span class="tl-label" style="color:#f472b6">Sprint Review</span></div>
+    <div class="tl-badge"><span class="tl-icon">🧩</span><span class="tl-label" style="color:#fb923c">Decomposition</span></div>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item" onclick="scrollToSection(5)">
+    <div class="tl-badge"><span class="tl-icon">🎯</span><span class="tl-label" style="color:#f472b6">Sprint Review</span></div>
+  </div>
+  <div class="tl-line"></div>
+  <div class="tl-item" onclick="scrollToSection(6)">
     <div class="tl-badge"><span class="tl-icon">🔍</span><span class="tl-label" style="color:#34d399">Retrospective</span></div>
   </div>
 </div>
@@ -269,8 +310,80 @@
   </div>
 </div>
 
-<!-- 3. Story Hydration -->
+<!-- 3. Backlog Refinement -->
 <div class="section s3" id="sec-2">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="s-icon">🗂️</div>
+      <div class="s-header-text">
+        <h2 style="color:#fbbf24">Backlog Refinement</h2>
+        <p>The team reviews, clarifies, and estimates upcoming backlog items so they're well-understood and ready before sprint planning begins.</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="pill">👥 <strong>Who:</strong> Dev team, Scrum Master, Product Owner</div>
+      <div class="pill">📅 <strong>When:</strong> Mid-sprint, before next sprint planning</div>
+      <div class="pill">⏱️ <strong>Duration:</strong> ~1 hour per week of sprint</div>
+      <div class="pill">🏗️ <strong>Framework:</strong> Scrum</div>
+    </div>
+    <div class="section-body">
+      <div class="purpose-col">
+        <div class="col-label">Purpose</div>
+        <p>Refinement (also called grooming) keeps the product backlog healthy and sprint-ready. The product owner presents upcoming stories, the team asks clarifying questions, and the group estimates complexity — ensuring sprint planning can move fast with well-understood work. Stories that aren't clear enough get sent back for further definition.</p>
+        <ul class="questions" style="margin-top:16px">
+          <li><span class="q-num">?</span>Is this story well enough defined to estimate?</li>
+          <li><span class="q-num">?</span>Do we understand the acceptance criteria?</li>
+          <li><span class="q-num">?</span>Can this be completed within a single sprint?</li>
+          <li><span class="q-num">?</span>Are there dependencies we need to flag?</li>
+        </ul>
+        <div class="outcome">
+          <strong>🎯 Outcome</strong>
+          A groomed, prioritised backlog with estimated, clearly-defined stories ready for the next sprint.
+        </div>
+      </div>
+      <div class="tip-col">
+        <div class="col-label">💡 Pro Tip</div>
+        <div class="tip-box">
+          <p>Aim to have 2–3 sprints worth of refined stories in the backlog at all times. This gives the team a buffer and means sprint planning is never blocked waiting on unclear work. The product owner should come prepared — stories without acceptance criteria shouldn't make it into refinement.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conformity Bias Pitfall -->
+    <div class="pitfall-wrap">
+      <div class="pitfall-box">
+        <div class="pitfall-header">
+          <div class="pitfall-icon">⚠️</div>
+          <div>
+            <h3>Common Pitfall: Estimation Conformity</h3>
+            <p>One of the most damaging (and most common) anti-patterns in refinement</p>
+          </div>
+        </div>
+        <div class="pitfall-body">
+          <div class="pitfall-col">
+            <div class="conformity-tag">⚡ Conformity Bias</div>
+            <p>One person — often a senior dev, tech lead, or the loudest voice in the room — announces what they think the estimate should be. Everyone else, consciously or not, anchors to that number and follows along.</p>
+            <p style="margin-top:12px">The result? Estimates that reflect one person's opinion, not the collective wisdom of the team. Hidden complexity goes unspoken. Junior team members with valid concerns stay quiet. The whole point of group estimation is undermined.</p>
+          </div>
+          <div class="pitfall-col">
+            <div class="pitfall-col-label">✅ How to prevent it</div>
+            <ul class="fix-list">
+              <li><span class="fix-dot">1</span><span><strong style="color:#e2e8f0">Use Planning Poker.</strong> Everyone reveals their estimate simultaneously — no anchoring, no following the leader.</span></li>
+              <li><span class="fix-dot">2</span><span><strong style="color:#e2e8f0">Collect estimates privately first.</strong> Tools like Jira, Poker Planner, or even hand signals keep estimates hidden until everyone is ready.</span></li>
+              <li><span class="fix-dot">3</span><span><strong style="color:#e2e8f0">Discuss outliers, not consensus.</strong> When estimates differ, dig into why — those gaps reveal the most valuable information.</span></li>
+              <li><span class="fix-dot">4</span><span><strong style="color:#e2e8f0">Explicitly invite quieter voices.</strong> Ask junior team members to share before senior ones. Their perspective often surfaces real complexity.</span></li>
+              <li><span class="fix-dot">5</span><span><strong style="color:#e2e8f0">Make it safe to disagree.</strong> A team culture where challenge is welcomed is the best long-term defence against groupthink.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 4. Story Hydration -->
+<div class="section s4" id="sec-3">
   <div class="section-inner">
     <div class="section-header">
       <div class="s-icon">💧</div>
@@ -308,8 +421,8 @@
   </div>
 </div>
 
-<!-- 4. Decomposition -->
-<div class="section s4" id="sec-3">
+<!-- 5. Decomposition -->
+<div class="section s5" id="sec-4">
   <div class="section-inner">
     <div class="section-header">
       <div class="s-icon">🧩</div>
@@ -346,8 +459,8 @@
   </div>
 </div>
 
-<!-- 5. Sprint Review -->
-<div class="section s5" id="sec-4">
+<!-- 6. Sprint Review -->
+<div class="section s6" id="sec-5">
   <div class="section-inner">
     <div class="section-header">
       <div class="s-icon">🎯</div>
@@ -377,8 +490,8 @@
   </div>
 </div>
 
-<!-- 6. Retrospective -->
-<div class="section s6" id="sec-5">
+<!-- 7. Retrospective -->
+<div class="section s7" id="sec-6">
   <div class="section-inner">
     <div class="section-header">
       <div class="s-icon">🔍</div>
@@ -407,9 +520,7 @@
         <div class="col-label">💡 Resources</div>
         <div class="tip-box">
           <p>Need fresh ideas to keep retrospectives engaging? Retromat is a free tool packed with activities and exercises to help you plan varied, effective retros — so your team never suffers from retro fatigue.</p>
-          <a class="resource-link" href="https://retromat.org/en/" target="_blank">
-            🔀 Explore Retromat →
-          </a>
+          <a class="resource-link" href="https://retromat.org/en/" target="_blank">🔀 Explore Retromat →</a>
         </div>
         <div class="outcome" style="margin-top:16px">
           <strong>🎯 Outcome</strong>
@@ -421,7 +532,7 @@
 </div>
 
 <footer>
-  Built for agile teams &nbsp;·&nbsp; Retromat resource via <a href="https://retromat.org/en/" target="_blank" style="color:#34d399;text-decoration:none">retromat.org</a>
+  Built for agile teams &nbsp;·&nbsp; Retromat resource via <a href="https://retromat.org/en/" target="_blank" style="color:#34d399">retromat.org</a>
 </footer>
 
 <script>
@@ -446,7 +557,7 @@
         dots.forEach((d, i) => d.classList.toggle('active', i === idx + 1));
       }
     });
-  }, { threshold: 0.2 });
+  }, { threshold: 0.15 });
 
   sections.forEach(s => obs.observe(s));
 
