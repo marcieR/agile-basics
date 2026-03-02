@@ -163,6 +163,19 @@
     display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;
   }
 
+  /* Retro steps */
+  .retro-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .retro-num {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(52,211,153,0.15); color: #34d399;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+
   /* Resource link */
   .resource-link {
     display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
@@ -547,9 +560,31 @@
         </ul>
       </div>
       <div class="tip-col">
-        <div class="col-label">💡 Resources</div>
+        <div class="col-label">5 Activities</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div class="retro-step">
+            <div class="retro-num">1</div>
+            <div><strong style="color:#e2e8f0;font-size:0.88rem">Set the Stage</strong><p style="font-size:0.82rem;color:#64748b;margin-top:2px;line-height:1.5">Create a safe environment. Help the team focus and get comfortable sharing openly.</p></div>
+          </div>
+          <div class="retro-step">
+            <div class="retro-num">2</div>
+            <div><strong style="color:#e2e8f0;font-size:0.88rem">Gather Data</strong><p style="font-size:0.82rem;color:#64748b;margin-top:2px;line-height:1.5">Look at what happened — facts, feelings, and events from the sprint without judgement.</p></div>
+          </div>
+          <div class="retro-step">
+            <div class="retro-num">3</div>
+            <div><strong style="color:#e2e8f0;font-size:0.88rem">Generate Insights</strong><p style="font-size:0.82rem;color:#64748b;margin-top:2px;line-height:1.5">Dig into the why. Identify patterns, root causes, and opportunities hidden in the data.</p></div>
+          </div>
+          <div class="retro-step">
+            <div class="retro-num">4</div>
+            <div><strong style="color:#e2e8f0;font-size:0.88rem">Decide What to Do</strong><p style="font-size:0.82rem;color:#64748b;margin-top:2px;line-height:1.5">Pick a small number of concrete actions the team commits to in the next sprint.</p></div>
+          </div>
+          <div class="retro-step">
+            <div class="retro-num">5</div>
+            <div><strong style="color:#e2e8f0;font-size:0.88rem">Close the Retro</strong><p style="font-size:0.82rem;color:#64748b;margin-top:2px;line-height:1.5">Appreciate contributions, summarise actions, and end on a positive note.</p></div>
+          </div>
+        </div>
         <div class="tip-box">
-          <p>Need fresh ideas to keep retrospectives engaging? Retromat is a free tool packed with activities and exercises to help you plan varied, effective retros — so your team never suffers from retro fatigue.</p>
+          <p>Need fresh ideas for each activity? Retromat is a free tool packed with exercises to keep retros varied and engaging.</p>
           <a class="resource-link" href="https://retromat.org/en/" target="_blank">🔀 Explore Retromat →</a>
         </div>
         <div class="outcome" style="margin-top:16px">
