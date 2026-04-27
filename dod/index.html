@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Definition of Done &amp; Definition of Ready — Agile Hub</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0e1a; --card: #111827; --text: #e2e8f0; --muted: #64748b; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 10%, rgba(52,211,153,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 85% 80%, rgba(99,102,241,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(34,211,238,0.05) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Progress bar ── */
+    .prog-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.05); z-index: 200; }
+    .prog-bar { height: 100%; background: linear-gradient(90deg, #34d399, #6366f1, #22d3ee); width: 0%; transition: width .1s; }
+
+    /* ── Nav ── */
+    nav:not(.nav-dots) {
+      position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(10,14,26,0.7); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+    .nav-logo span { background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 600px) { nav:not(.nav-dots) { padding: 14px 20px; } .nav-links { gap: 16px; } }
+
+    /* ── Header ── */
+    header { position: relative; z-index: 1; text-align: center; padding: 110px 24px 56px; }
+    .eyebrow {
+      display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+      color: #34d399; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 100px; padding: 6px 18px; margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem); font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, #34d399 60%, #6366f1 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 16px;
+    }
+    .subtitle { color: var(--muted); font-size: 1.05rem; max-width: 620px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── Section ── */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 1000px; margin: 0 auto 72px; padding: 0 24px;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .section.visible { opacity: 1; transform: translateY(0); }
+    .section-inner { border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; background: var(--card); }
+
+    /* ── Section header ── */
+    .sec-header {
+      padding: 36px 44px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .sec-icon {
+      width: 64px; height: 64px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; flex-shrink: 0;
+    }
+    .sec-header-text h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+    .sec-header-text .tagline { color: var(--muted); font-size: 0.95rem; line-height: 1.65; max-width: 700px; }
+
+    /* ── Why it matters ── */
+    .why-block {
+      padding: 28px 44px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .block-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 14px; }
+    .why-text { font-size: 0.93rem; color: #cbd5e1; line-height: 1.8; font-weight: 300; }
+
+    /* ── Checklist ── */
+    .checklist-block {
+      padding: 28px 44px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .checklist-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 20px; margin-top: 4px;
+    }
+    @media (max-width: 700px) { .checklist-grid { grid-template-columns: 1fr; } }
+    .checklist-category { display: flex; flex-direction: column; gap: 8px; }
+    .category-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 11px 14px;
+    }
+    .check-box {
+      width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0;
+      border: 2px solid; background: transparent;
+    }
+    .check-item span { font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; font-weight: 400; }
+
+    /* ── Callout box ── */
+    .callout-block { padding: 28px 44px 32px; }
+    .callout-inner {
+      border-radius: 16px; padding: 22px 26px;
+      display: flex; gap: 18px; align-items: flex-start;
+    }
+    .callout-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+    .callout-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+    .callout-text { font-size: 0.9rem; color: #cbd5e1; line-height: 1.75; font-weight: 300; }
+
+    /* ── DoD vs DoR + Build them grid ── */
+    .bottom-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    @media (max-width: 700px) { .bottom-grid { grid-template-columns: 1fr; } }
+    .bottom-col { padding: 28px 44px 36px; }
+    .bottom-col:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+    @media (max-width: 700px) { .bottom-col:first-child { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); } }
+    .contrast-grid { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .contrast-box { border-radius: 12px; padding: 16px 18px; }
+    .contrast-box .contrast-tag { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .contrast-box p { font-size: 0.87rem; color: #cbd5e1; line-height: 1.65; font-weight: 300; }
+    .steps-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .step-item { display: flex; align-items: flex-start; gap: 14px; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+    }
+    .step-item p { font-size: 0.87rem; color: #cbd5e1; line-height: 1.6; font-weight: 300; padding-top: 4px; }
+    .step-item p strong { font-weight: 600; color: var(--text); }
+
+    /* ── Footer ── */
+    footer { position: relative; z-index: 1; text-align: center; padding: 48px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--muted); font-size: 0.85rem; line-height: 2; }
+    footer a { color: #a5b4fc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Mobile tweaks ── */
+    @media (max-width: 700px) {
+      .sec-header, .why-block, .checklist-block, .callout-block, .bottom-col { padding-left: 22px !important; padding-right: 22px !important; }
+      .sec-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prog-wrap"><div class="prog-bar" id="pb"></div></div>
+
+  <nav>
+    <a href="/agile-basics/" class="nav-logo"><span>Agile</span> Hub</a>
+    <div class="nav-links">
+      <a href="/agile-basics/#manifesto">Manifesto</a>
+      <a href="/agile-basics/agile-manifesto/">Principles</a>
+      <a href="/agile-basics/ceremonies/">Ceremonies</a>
+      <a href="/agile-basics/roles/">Responsibilities</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="eyebrow">Quality Gates</div>
+    <h1>Definition of Done<br>&amp; Definition of Ready</h1>
+    <p class="subtitle">Two agreements that eliminate the most common source of sprint failure — ambiguity about when work starts and when it ends.</p>
+  </header>
+
+  <!-- ── Section 1: Definition of Done ── -->
+  <div class="section" id="sec-dod">
+    <div class="section-inner">
+
+      <div class="sec-header">
+        <div class="sec-icon" style="background: rgba(52,211,153,0.13);">✅</div>
+        <div class="sec-header-text">
+          <h2 style="color: #34d399;">Definition of Done</h2>
+          <p class="tagline">A shared, team-owned checklist that every story must pass before it can be called complete. Not "done enough" — done.</p>
+        </div>
+      </div>
+
+      <div class="why-block">
+        <div class="block-label" style="color: #34d399;">Why it matters</div>
+        <p class="why-text">Without a DoD, "done" means something different to every team member — engineers think done means code merged, QA thinks done means tested, PO thinks done means in production. The DoD makes the implicit explicit. It replaces subjective judgment with a shared, enforceable standard that the whole team has agreed to uphold, sprint after sprint.</p>
+      </div>
+
+      <div class="checklist-block">
+        <div class="block-label" style="color: #34d399;">The checklist</div>
+        <div class="checklist-grid">
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #34d399;">Code Quality</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Code reviewed and approved</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>No new linting errors</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Code merged to main branch</span>
+            </div>
+          </div>
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #34d399;">Testing</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>All AC tested and passing</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Unit / integration tests written</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>CI pipeline passes</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Tested on staging / target environment</span>
+            </div>
+          </div>
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #34d399;">Delivery</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Deployed to staging or production</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>PO has reviewed and accepted</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Ticket updated in project tool</span>
+            </div>
+          </div>
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #34d399;">Documentation <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:9px;color:var(--muted)">(where applicable)</span></div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Relevant docs updated</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #34d399;"></div>
+              <span>Release notes / changelog updated</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="callout-block">
+        <div class="callout-inner" style="background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2);">
+          <div class="callout-icon">💡</div>
+          <div>
+            <div class="callout-label" style="color: #34d399;">How to build yours</div>
+            <p class="callout-text">Run a session in Sprint 0 or a retro. Ask: "what would have to be true for us to confidently call a story done?" Debate until everyone agrees. Enforce it every sprint. Revise quarterly.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Section 2: Definition of Ready ── -->
+  <div class="section" id="sec-dor">
+    <div class="section-inner">
+
+      <div class="sec-header">
+        <div class="sec-icon" style="background: rgba(99,102,241,0.13);">🔷</div>
+        <div class="sec-header-text">
+          <h2 style="color: #6366f1;">Definition of Ready</h2>
+          <p class="tagline">The criteria a story must meet before the team pulls it into a sprint. If it's not ready, it doesn't get planned.</p>
+        </div>
+      </div>
+
+      <div class="why-block">
+        <div class="block-label" style="color: #6366f1;">Why it matters</div>
+        <p class="why-text">Prevents mid-sprint chaos from stories that entered planning unclear. A story that isn't ready doesn't belong in a sprint — it belongs back in refinement. The DoR protects the team's ability to commit confidently and deliver without constant interruption for missing information.</p>
+      </div>
+
+      <div class="checklist-block">
+        <div class="block-label" style="color: #6366f1;">The checklist</div>
+        <div class="checklist-grid">
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #6366f1;">Clarity</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>User story in standard format (As a / I want / So that)</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>AC written and testable</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>The "why" is understood</span>
+            </div>
+          </div>
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #6366f1;">Scope &amp; Size</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Completable in one sprint</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Estimated by the team</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Edge cases and error states defined</span>
+            </div>
+          </div>
+
+          <div class="checklist-category">
+            <div class="category-label" style="color: #6366f1;">Dependencies</div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Dependencies identified and resolved or flagged</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Design assets available if applicable</span>
+            </div>
+            <div class="check-item">
+              <div class="check-box" style="border-color: #6366f1;"></div>
+              <span>Three Amigos review completed</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="bottom-grid">
+
+        <div class="bottom-col">
+          <div class="block-label" style="color: #94a3b8;">DoD vs DoR — the key difference</div>
+          <div class="contrast-grid">
+            <div class="contrast-box" style="background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2);">
+              <div class="contrast-tag" style="color: #34d399;">Definition of Done</div>
+              <p>End of the story. Owned by the whole team. Answers: "Can we ship this?" Applied when work is complete.</p>
+            </div>
+            <div class="contrast-box" style="background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.2);">
+              <div class="contrast-tag" style="color: #6366f1;">Definition of Ready</div>
+              <p>Start of the story. Owned by the Product Owner. Answers: "Can we start this?" Applied before sprint planning.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-col">
+          <div class="block-label" style="color: #94a3b8;">Build them as a team</div>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-num" style="background: rgba(99,102,241,0.18); color: #a5b4fc;">1</div>
+              <p><strong>Run a team session</strong> — Sprint 0, a retro, or a dedicated working session. Everyone present.</p>
+            </div>
+            <div class="step-item">
+              <div class="step-num" style="background: rgba(99,102,241,0.18); color: #a5b4fc;">2</div>
+              <p><strong>Start minimal</strong> — Aim for 5–8 items each. A checklist nobody enforces is just decoration.</p>
+            </div>
+            <div class="step-item">
+              <div class="step-num" style="background: rgba(99,102,241,0.18); color: #a5b4fc;">3</div>
+              <p><strong>Post them visibly</strong> — In your project tool, on a wiki page, or a physical board. If it's not visible, it's not used.</p>
+            </div>
+            <div class="step-item">
+              <div class="step-num" style="background: rgba(99,102,241,0.18); color: #a5b4fc;">4</div>
+              <p><strong>Revisit every quarter</strong> — As the team matures, the bar rises. Your DoD and DoR should too.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div>Built for agile teams &nbsp;·&nbsp; Part of <a href="/agile-basics/">Agile Hub</a></div>
+    <div style="margin-top: 8px;">Manifesto © 2001 <a href="https://agilemanifesto.org" target="_blank">the authors</a> &nbsp;·&nbsp; Retromat via <a href="https://retromat.org/en/" target="_blank">retromat.org</a></div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const el = document.documentElement;
+      document.getElementById('pb').style.width = (el.scrollTop / (el.scrollHeight - el.clientHeight) * 100) + '%';
+    });
+
+    const sections = document.querySelectorAll('.section');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    sections.forEach(s => obs.observe(s));
+  </script>
+</body>
+</html>

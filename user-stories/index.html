@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Stories — Agile Hub</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0e1a; --card: #111827; --text: #e2e8f0; --muted: #64748b; --accent: #fbbf24; --accent-bg: rgba(251,191,36,0.12); --accent-border: rgba(251,191,36,0.25); }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(251,191,36,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 85%, rgba(34,211,238,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 55% 50%, rgba(99,102,241,0.06) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Progress bar ── */
+    .prog-wrap { position: fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.05); z-index:200; }
+    .prog-bar { height:100%; background: linear-gradient(90deg,#fbbf24,#f59e0b,#fcd34d); width:0%; transition:width .1s; }
+
+    /* ── Nav ── */
+    nav.top-nav {
+      position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(10,14,26,0.7); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+    .nav-logo span { background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    @media (max-width: 600px) { nav.top-nav { padding: 14px 20px; } .nav-links { gap: 16px; } }
+
+    /* ── Header ── */
+    header { position: relative; z-index:1; text-align: center; padding: 110px 24px 56px; }
+    .eyebrow {
+      display: inline-block; font-size: 11px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+      color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-border);
+      border-radius: 100px; padding: 6px 18px; margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(2.4rem,6vw,4.2rem); font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, #fbbf24 65%, #f59e0b 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 16px;
+    }
+    .subtitle { color: var(--muted); font-size:1.05rem; max-width:600px; margin:0 auto; line-height:1.7; }
+
+    /* ── Sections ── */
+    .section {
+      position: relative; z-index:1;
+      max-width: 1000px; margin: 0 auto 72px; padding: 0 24px;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .section.visible { opacity:1; transform:translateY(0); }
+    .section-inner { border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; background: var(--card); }
+
+    /* ── Section header ── */
+    .sec-header {
+      padding: 36px 44px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .sec-icon {
+      width: 64px; height: 64px; border-radius: 18px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; background: var(--accent-bg);
+    }
+    .sec-header-text h2 { font-size: 1.8rem; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
+    .sec-header-text .sec-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.65; max-width: 640px; }
+
+    /* ── Body padding ── */
+    .sec-body { padding: 32px 44px 40px; }
+    .sec-body + .sec-body { border-top: 1px solid rgba(255,255,255,0.06); }
+
+    /* ── Format callout ── */
+    .format-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .prose { font-size: 0.95rem; color: #cbd5e1; line-height: 1.8; font-weight: 300; margin-bottom: 24px; }
+
+    /* ── Story example card ── */
+    .story-card {
+      border-radius: 16px; padding: 20px 24px;
+      background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2);
+      margin-bottom: 28px;
+    }
+    .story-card.bad {
+      background: rgba(251,113,133,0.05); border-color: rgba(251,113,133,0.2);
+    }
+    .story-card-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .story-card-label.good { color: #fbbf24; }
+    .story-card-label.bad  { color: #fb7185; }
+    .story-card p { font-size: 0.95rem; color: #e2e8f0; line-height: 1.75; }
+    .story-card p strong { color: var(--accent); font-weight: 700; }
+    .story-card.bad p strong { color: #fb7185; }
+    .story-card-reason { margin-top: 10px; font-size: 0.83rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── Part breakdown list ── */
+    .part-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .part-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .part-tag {
+      flex-shrink: 0; padding: 4px 12px; border-radius: 100px;
+      font-size: 0.78rem; font-weight: 700; font-family: monospace;
+      background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border);
+      white-space: nowrap; margin-top: 1px;
+    }
+    .part-text strong { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .part-text span { font-size: 0.83rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    /* ── INVEST grid ── */
+    .invest-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    @media (max-width: 640px) { .invest-grid { grid-template-columns: 1fr; } }
+    .invest-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; padding: 18px 20px;
+    }
+    .invest-letter {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 10px;
+      font-size: 1rem; font-weight: 900;
+      background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border);
+      margin-bottom: 12px;
+    }
+    .invest-card h3 { font-size: 0.92rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .invest-card p { font-size: 0.83rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── AC two-col ── */
+    .ac-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) { .ac-grid { grid-template-columns: 1fr; } }
+    .ac-col-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+    }
+    .gherkin-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .gherkin-item {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px 16px; font-size: 0.84rem; line-height: 1.65; color: #cbd5e1;
+    }
+    .gherkin-item .kw { font-weight: 700; color: var(--accent); }
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .rules-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.84rem; color: #cbd5e1; line-height: 1.6;
+    }
+    .rules-list li::before {
+      content: '–'; color: var(--accent); font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── Callout box ── */
+    .callout {
+      background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 14px; padding: 18px 22px;
+      font-size: 0.88rem; color: #cbd5e1; line-height: 1.7;
+    }
+    .callout strong { color: var(--accent); }
+
+    /* ── Split patterns ── */
+    .split-intro { margin-bottom: 24px; }
+    .split-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .split-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px 18px;
+    }
+    .split-num {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 800;
+      background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border);
+      margin-top: 1px;
+    }
+    .split-text strong { display: block; font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .split-text span { font-size: 0.83rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    /* ── Footer ── */
+    footer { position: relative; z-index:1; text-align: center; padding: 48px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--muted); font-size: 0.85rem; line-height: 2; }
+    footer a { color: #a5b4fc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+      .sec-header { padding: 24px 22px 20px; flex-direction: column; }
+      .sec-body { padding: 22px 22px 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="prog-wrap"><div class="prog-bar" id="pb"></div></div>
+
+  <nav class="top-nav">
+    <a href="/agile-basics/" class="nav-logo"><span>Agile</span> Hub</a>
+    <div class="nav-links">
+      <a href="/agile-basics/#manifesto">Manifesto</a>
+      <a href="/agile-basics/agile-manifesto/">Principles</a>
+      <a href="/agile-basics/ceremonies/">Ceremonies</a>
+      <a href="/agile-basics/roles/">Responsibilities</a>
+    </div>
+  </nav>
+
+  <header>
+    <div class="eyebrow">Story Writing</div>
+    <h1>How to Write Great<br>User Stories</h1>
+    <p class="subtitle">The format is simple. The discipline isn't. Here's how to write stories your team can actually build from.</p>
+  </header>
+
+  <!-- ── Section 1: The Three-Part Format ── -->
+  <div class="section" id="sec-0">
+    <div class="section-inner">
+      <div class="sec-header">
+        <div class="sec-icon">📝</div>
+        <div class="sec-header-text">
+          <h2>As a… I want… So that…</h2>
+          <p class="sec-sub">The format forces three things: who the user is, what they need, and why it matters. Skip any part and you lose context the team needs to make good decisions.</p>
+        </div>
+      </div>
+
+      <div class="sec-body">
+        <div class="format-label">A good example</div>
+        <div class="story-card">
+          <div class="story-card-label good">Good story</div>
+          <p>As a <strong>project manager</strong>, I want to <strong>filter tasks by assignee</strong>, so that <strong>I can see each team member's workload at a glance</strong>.</p>
+        </div>
+
+        <div class="format-label">Breaking it down</div>
+        <ul class="part-list">
+          <li class="part-item">
+            <span class="part-tag">As a [persona]</span>
+            <div class="part-text">
+              <strong>Defines who benefits</strong>
+              <span>Prevents building for imaginary users. A named persona forces you to think about the real person and their real context — not a generic abstraction.</span>
+            </div>
+          </li>
+          <li class="part-item">
+            <span class="part-tag">I want [action]</span>
+            <div class="part-text">
+              <strong>The capability needed, not the solution</strong>
+              <span>Focus on what the user needs to do, not how it should be implemented. "Filter by assignee" leaves the design open — "add a dropdown filter" locks it in prematurely.</span>
+            </div>
+          </li>
+          <li class="part-item">
+            <span class="part-tag">So that [outcome]</span>
+            <div class="part-text">
+              <strong>The business value</strong>
+              <span>Keeps the team focused on impact, not just output. When the implementation gets complex, this is the north star that guides trade-off decisions.</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="format-label">A bad example — and why it fails</div>
+        <div class="story-card bad">
+          <div class="story-card-label bad">Bad story</div>
+          <p>As a <strong>user</strong>, I want the <strong>system to be better</strong>.</p>
+          <div class="story-card-reason">
+            "User" is not a persona — it gives no context about who this is or what they care about. "Be better" is not an action — it's a vague sentiment that can't be designed, estimated, or tested. And without a "so that", there's no measurable outcome to aim for. Every part fails.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: INVEST ── -->
+  <div class="section" id="sec-1">
+    <div class="section-inner">
+      <div class="sec-header">
+        <div class="sec-icon">💡</div>
+        <div class="sec-header-text">
+          <h2>The INVEST Test</h2>
+          <p class="sec-sub">Every story should pass all six criteria before entering refinement.</p>
+        </div>
+      </div>
+
+      <div class="sec-body">
+        <div class="invest-grid">
+          <div class="invest-card">
+            <div class="invest-letter">I</div>
+            <h3>Independent</h3>
+            <p>Stories shouldn't depend on each other. Dependencies create sequencing problems in planning and make it impossible to prioritise freely.</p>
+          </div>
+          <div class="invest-card">
+            <div class="invest-letter">N</div>
+            <h3>Negotiable</h3>
+            <p>The story isn't a contract. Details can change through conversation — only the goal is fixed. Stories are placeholders for a conversation, not specifications.</p>
+          </div>
+          <div class="invest-card">
+            <div class="invest-letter">V</div>
+            <h3>Valuable</h3>
+            <p>Delivers value to a real user or the business. If you can't answer "who benefits?", the story isn't ready. Technical tasks that have no user-facing impact should be framed differently.</p>
+          </div>
+          <div class="invest-card">
+            <div class="invest-letter">E</div>
+            <h3>Estimable</h3>
+            <p>The team can estimate it. If they can't, it's either too big, too vague, or needs a spike to reduce uncertainty before planning.</p>
+          </div>
+          <div class="invest-card">
+            <div class="invest-letter">S</div>
+            <h3>Small</h3>
+            <p>Completable in a single sprint. If it can't fit, split it. Large stories always slip — they carry hidden complexity and make sprint commitments unreliable.</p>
+          </div>
+          <div class="invest-card">
+            <div class="invest-letter">T</div>
+            <h3>Testable</h3>
+            <p>Has acceptance criteria that can pass or fail. Untestable stories ship ambiguity. If QA can't write test cases from the AC, the story isn't done being written.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: Acceptance Criteria ── -->
+  <div class="section" id="sec-2">
+    <div class="section-inner">
+      <div class="sec-header">
+        <div class="sec-icon">✅</div>
+        <div class="sec-header-text">
+          <h2>Acceptance Criteria That Actually Work</h2>
+          <p class="sec-sub">AC is the contract between the PO and the team. Good AC is specific, testable, and complete — covering happy paths, error states, and edge cases.</p>
+        </div>
+      </div>
+
+      <div class="sec-body">
+        <div class="ac-grid">
+          <div>
+            <div class="ac-col-label">Given / When / Then — Gherkin format</div>
+            <ul class="gherkin-list">
+              <li class="gherkin-item">
+                <span class="kw">Given</span> the user is on the task list,<br>
+                <span class="kw">When</span> they click the filter dropdown,<br>
+                <span class="kw">Then</span> they see a list of all assignees.
+              </li>
+              <li class="gherkin-item">
+                <span class="kw">Given</span> no tasks match the filter,<br>
+                <span class="kw">When</span> the filter is applied,<br>
+                <span class="kw">Then</span> an empty state message is shown.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div class="ac-col-label">Rules-based format</div>
+            <ul class="rules-list">
+              <li>Filter shows only assignees with active tasks</li>
+              <li>Selecting multiple assignees uses OR logic</li>
+              <li>Filter state persists on page refresh</li>
+              <li>Mobile: filter collapses into a full-screen sheet</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Both formats work.</strong> Pick one and use it consistently. The goal is that QA can write test cases from AC without asking questions. If they need to ask, the AC isn't done yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Story Splitting ── -->
+  <div class="section" id="sec-3">
+    <div class="section-inner">
+      <div class="sec-header">
+        <div class="sec-icon">✂️</div>
+        <div class="sec-header-text">
+          <h2>How to Split a Story That's Too Big</h2>
+          <p class="sec-sub">The most common mistake is treating a large story as a planning problem. It's a writing problem. Every large story can be split — here's how.</p>
+        </div>
+      </div>
+
+      <div class="sec-body">
+        <ul class="split-list">
+          <li class="split-item">
+            <div class="split-num">1</div>
+            <div class="split-text">
+              <strong>By workflow step</strong>
+              <span>Split along the natural steps of a user flow. "Submit a form" becomes "enter data", "validate data", and "confirm submission" — each independently shippable.</span>
+            </div>
+          </li>
+          <li class="split-item">
+            <div class="split-num">2</div>
+            <div class="split-text">
+              <strong>By user role</strong>
+              <span>If different users do different things, split by persona. What an admin can do and what a standard user can do are often two distinct stories.</span>
+            </div>
+          </li>
+          <li class="split-item">
+            <div class="split-num">3</div>
+            <div class="split-text">
+              <strong>By data variation</strong>
+              <span>Handle one data type first, then others. "Import CSV files" before "import Excel files" — same feature, smaller increments, faster feedback.</span>
+            </div>
+          </li>
+          <li class="split-item">
+            <div class="split-num">4</div>
+            <div class="split-text">
+              <strong>By happy path first</strong>
+              <span>Build the success case, then add error handling and edge cases as separate stories. The happy path is almost always independently valuable.</span>
+            </div>
+          </li>
+          <li class="split-item">
+            <div class="split-num">5</div>
+            <div class="split-text">
+              <strong>By interface</strong>
+              <span>Deliver the core functionality first — API or backend — then build the UI on top. Backend-first stories give the team an integration point without blocking on design.</span>
+            </div>
+          </li>
+          <li class="split-item">
+            <div class="split-num">6</div>
+            <div class="split-text">
+              <strong>By acceptance criteria</strong>
+              <span>If a story has 8 AC items, it's probably 2–3 stories. Split the AC, not just the points. Each chunk should have a coherent, independently testable outcome.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Built for agile teams &nbsp;·&nbsp; Part of <a href="/agile-basics/">Agile Hub</a></div>
+    <div style="margin-top:8px">Manifesto © 2001 <a href="https://agilemanifesto.org" target="_blank">the authors</a> &nbsp;·&nbsp; Retromat via <a href="https://retromat.org/en/" target="_blank">retromat.org</a></div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const el = document.documentElement;
+      document.getElementById('pb').style.width = (el.scrollTop / (el.scrollHeight - el.clientHeight) * 100) + '%';
+    });
+
+    const sections = document.querySelectorAll('.section');
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+
+    sections.forEach(s => obs.observe(s));
+  </script>
+</body>
+</html>

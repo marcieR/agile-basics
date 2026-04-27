@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile Anti-Patterns</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e1a;
+    --card: #111827;
+    --accent1: #6366f1;
+    --accent2: #22d3ee;
+    --accent3: #f472b6;
+    --text: #e2e8f0;
+    --muted: #64748b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34,211,238,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 50%, rgba(244,114,182,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 110px 24px 60px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    background: rgba(34,211,238,0.1);
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 100px;
+    padding: 6px 18px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent1) 70%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    z-index: 100;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    width: 0%;
+    transition: width 0.1s;
+  }
+
+  /* Grid */
+  .grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 100px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--glow);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+
+  .card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  .card-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--c);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-num::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--c), transparent);
+    opacity: 0.3;
+  }
+
+  .card-num .num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--c);
+    flex-shrink: 0;
+  }
+
+  .card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+    font-weight: 300;
+  }
+
+  .card .icon {
+    position: absolute;
+    bottom: 20px;
+    right: 24px;
+    font-size: 2.5rem;
+    opacity: 0.12;
+    transition: opacity 0.3s, transform 0.3s;
+    user-select: none;
+  }
+
+  .card:hover .icon {
+    opacity: 0.25;
+    transform: scale(1.2) rotate(-5deg);
+  }
+
+  /* Color themes per card */
+  .c1  { --c: #6366f1; --glow: radial-gradient(ellipse at 0% 0%, rgba(99,102,241,0.08), transparent 70%); }
+  .c2  { --c: #22d3ee; --glow: radial-gradient(ellipse at 100% 0%, rgba(34,211,238,0.08), transparent 70%); }
+  .c3  { --c: #f472b6; --glow: radial-gradient(ellipse at 0% 100%, rgba(244,114,182,0.08), transparent 70%); }
+  .c4  { --c: #34d399; --glow: radial-gradient(ellipse at 100% 100%, rgba(52,211,153,0.08), transparent 70%); }
+  .c5  { --c: #fbbf24; --glow: radial-gradient(ellipse at 0% 0%, rgba(251,191,36,0.08), transparent 70%); }
+  .c6  { --c: #a78bfa; --glow: radial-gradient(ellipse at 100% 0%, rgba(167,139,250,0.08), transparent 70%); }
+  .c7  { --c: #fb923c; --glow: radial-gradient(ellipse at 0% 100%, rgba(251,146,60,0.08), transparent 70%); }
+  .c8  { --c: #38bdf8; --glow: radial-gradient(ellipse at 100% 100%, rgba(56,189,248,0.08), transparent 70%); }
+  .c9  { --c: #e879f9; --glow: radial-gradient(ellipse at 0% 0%, rgba(232,121,249,0.08), transparent 70%); }
+  .c10 { --c: #4ade80; --glow: radial-gradient(ellipse at 100% 0%, rgba(74,222,128,0.08), transparent 70%); }
+  .c11 { --c: #f87171; --glow: radial-gradient(ellipse at 0% 100%, rgba(248,113,113,0.08), transparent 70%); }
+  .c12 { --c: #67e8f9; --glow: radial-gradient(ellipse at 100% 100%, rgba(103,232,249,0.08), transparent 70%); }
+
+  /* Fade-in animation */
+  .card {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Nav */
+  nav.top-nav {
+    position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(10,14,26,0.7); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+  .nav-logo span { background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--text); }
+  @media (max-width: 600px) { nav.top-nav { padding: 14px 20px; } .nav-links { gap: 16px; } }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 2;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  footer a { color: #a5b4fc; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="progress-wrap"><div class="progress-bar" id="pb"></div></div>
+
+<nav class="top-nav">
+  <a href="/agile-basics/" class="nav-logo"><span>Agile</span> Hub</a>
+  <div class="nav-links">
+    <a href="/agile-basics/#manifesto">Manifesto</a>
+    <a href="/agile-basics/agile-manifesto/">Principles</a>
+    <a href="/agile-basics/ceremonies/">Ceremonies</a>
+    <a href="/agile-basics/roles/">Responsibilities</a>
+  </div>
+</nav>
+
+<header>
+  <div class="eyebrow">What to Avoid</div>
+  <h1>Agile Anti-Patterns</h1>
+  <p class="subtitle">The ceremonies are right. The roles are clear. And yet the team is struggling. These are the patterns that explain why.</p>
+</header>
+
+<div class="grid">
+
+  <div class="card c1" style="animation-delay:0.05s">
+    <div class="card-num"><span class="num">1</span> Scrum But</div>
+    <p>"We do Scrum, but…" — the team adopts the vocabulary without the discipline. Ceremonies happen on the calendar but not in spirit. The most common form: "we do Scrum but the SM also assigns tasks" or "we do Scrum but we skip retros when we're busy." Scrum works as a system. Removing parts removes the feedback loops that make it work.</p>
+    <span class="icon">🔧</span>
+  </div>
+
+  <div class="card c2" style="animation-delay:0.1s">
+    <div class="card-num"><span class="num">2</span> Zombie Standup</div>
+    <p>Standup has become a daily status report directed at the Scrum Master or manager, not a team sync. Each person recites what they did yesterday and what they'll do today — eyes on one person, no one listening. The sprint goal is never mentioned. Blockers get a polite nod and are promptly forgotten. A standup that doesn't surface blockers or mention the sprint goal isn't a standup — it's a ritual.</p>
+    <span class="icon">🧟</span>
+  </div>
+
+  <div class="card c3" style="animation-delay:0.15s">
+    <div class="card-num"><span class="num">3</span> The Absentee Product Owner</div>
+    <p>The PO is too busy, too senior, or too disconnected to be available to the team. Questions sit unanswered for days. Engineers make assumptions. Assumptions become features nobody wanted. The single most expensive thing a PO can do is be unavailable — every hour of waiting compounds into rework.</p>
+    <span class="icon">👻</span>
+  </div>
+
+  <div class="card c4" style="animation-delay:0.2s">
+    <div class="card-num"><span class="num">4</span> Velocity as Performance Metric</div>
+    <p>Management uses velocity to compare teams, track "productivity," or set delivery commitments. The team responds rationally: estimates inflate, easy stories get prioritised, and velocity rises while actual throughput falls. Velocity is a planning tool for the team — the moment it becomes a KPI for someone else, it stops being useful as either.</p>
+    <span class="icon">📊</span>
+  </div>
+
+  <div class="card c5" style="animation-delay:0.25s">
+    <div class="card-num"><span class="num">5</span> Mid-Sprint Scope Creep</div>
+    <p>Work gets added to an active sprint — "it's just a small thing," "the stakeholder needs it this week," "it won't take long." Each exception trains the team that the sprint commitment means nothing. Velocity becomes unpredictable. The team stops committing honestly because they know the sprint will change anyway.</p>
+    <span class="icon">🌊</span>
+  </div>
+
+  <div class="card c6" style="animation-delay:0.3s">
+    <div class="card-num"><span class="num">6</span> Definition of Done Theater</div>
+    <p>Stories get marked "Done" without meeting the Definition of Done. Tests aren't written. The PO hasn't reviewed. It's deployed to dev, not staging. The team knows it, the SM knows it, and everyone moves on. The DoD becomes a box-ticking exercise rather than a quality gate. Technical debt accumulates invisibly until it collapses into a production incident.</p>
+    <span class="icon">🎭</span>
+  </div>
+
+  <div class="card c7" style="animation-delay:0.35s">
+    <div class="card-num"><span class="num">7</span> The HiPPO Effect</div>
+    <p>The Highest Paid Person's Opinion overrides the team's prioritisation, estimation, and design decisions. The PO can't push back. The team learns not to speak honestly. Backlogs get restructured around executive whims, and the inspect-and-adapt cycle breaks down entirely.</p>
+    <span class="icon">🦛</span>
+  </div>
+
+  <div class="card c8" style="animation-delay:0.4s">
+    <div class="card-num"><span class="num">8</span> Eternal Refinement</div>
+    <p>Stories are refined in meeting after meeting but never reach a state where the team feels confident starting them. Analysis paralysis dressed up as process. The root cause is usually that the PO hasn't made a decision — refinement can't substitute for product ownership.</p>
+    <span class="icon">🔄</span>
+  </div>
+
+  <div class="card c9" style="animation-delay:0.45s">
+    <div class="card-num"><span class="num">9</span> Sprint Carryover Culture</div>
+    <p>Carrying stories over between sprints becomes the norm rather than the exception. The sprint goal is abandoned. Velocity is consistently overstated in planning. The team loses the habit of committing honestly because they know the sprint boundary is soft. Carryover is a signal — either estimation is poor, scope was changed, or the sprint goal wasn't taken seriously.</p>
+    <span class="icon">📦</span>
+  </div>
+
+  <div class="card c10" style="animation-delay:0.5s">
+    <div class="card-num"><span class="num">10</span> Siloed QA</div>
+    <p>Testing happens at the end of the sprint, after engineering is "done." QA is a bottleneck, bugs discovered too late to fix in the sprint, and "done" stories pile up waiting for a test pass that never comes. Agile QA starts at story kick-off, not story completion. If QA isn't in refinement and hydration, they'll always be scrambling.</p>
+    <span class="icon">🚧</span>
+  </div>
+
+  <div class="card c11" style="animation-delay:0.55s">
+    <div class="card-num"><span class="num">11</span> The Estimation Negotiation</div>
+    <p>"Can we do it in 3 points instead of 5?" is not a product conversation. When POs or managers negotiate estimates down, the team learns to pad estimates in advance. Honesty disappears from the process. Estimates belong to the team — they are a forecast, not a commitment to be bargained.</p>
+    <span class="icon">🤝</span>
+  </div>
+
+  <div class="card c12" style="animation-delay:0.6s">
+    <div class="card-num"><span class="num">12</span> The God Sprint</div>
+    <p>The sprint length keeps growing — from 2 weeks to 3, then 4, then "we'll just do a 6-week sprint for this one." Longer sprints reduce the inspect-and-adapt frequency, hide planning problems, and let bad decisions compound for longer before feedback arrives. Sprint length should match the pace at which requirements change — for most teams, that's 2 weeks.</p>
+    <span class="icon">⏰</span>
+  </div>
+
+</div>
+
+<footer>
+  <div>Built for agile teams &nbsp;·&nbsp; Part of <a href="/agile-basics/">Agile Hub</a></div>
+</footer>
+
+<script>
+  // Scroll progress bar
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('pb').style.width = pct + '%';
+  });
+</script>
+</body>
+</html>

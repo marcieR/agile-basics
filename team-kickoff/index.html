@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Kickoff &amp; Working Agreements</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0a0e1a; --card: #111827; --text: #e2e8f0; --muted: #64748b; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 20%, rgba(167,139,250,0.13) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 80%, rgba(167,139,250,0.08) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .prog-wrap { position: fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.05); z-index:100; }
+  .prog-bar { height:100%; background: linear-gradient(90deg,#a78bfa,#c4b5fd); width:0%; transition:width .1s; }
+
+  /* ── Nav ── */
+  nav.top-nav {
+    position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 48px;
+    background: rgba(10,14,26,0.7); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; text-decoration: none; color: #e2e8f0; }
+  .nav-logo span { background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: #64748b; font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: #e2e8f0; }
+  @media (max-width: 600px) { nav.top-nav { padding: 14px 20px; } .nav-links { gap: 16px; } }
+
+  header { position: relative; z-index:1; text-align: center; padding: 110px 24px 56px; }
+  .eyebrow {
+    display: inline-block; font-size: 11px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+    color: #a78bfa; background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 100px; padding: 6px 18px; margin-bottom: 24px;
+  }
+  h1 {
+    font-size: clamp(2.4rem,6vw,4.2rem); font-weight: 900; line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, #a78bfa 65%, #c4b5fd 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px;
+  }
+  .subtitle { color: var(--muted); font-size:1.05rem; max-width:560px; margin:0 auto; line-height:1.7; }
+
+  /* Sections */
+  .section {
+    position: relative; z-index:1; max-width: 1100px; margin: 0 auto 72px; padding: 0 24px;
+    opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .section.visible { opacity:1; transform:translateY(0); }
+  .section-inner { border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; background: var(--card); }
+
+  .section-header {
+    padding: 36px 44px 28px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: flex-start; gap: 20px;
+  }
+  .s-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; background: rgba(167,139,250,0.15); }
+  .s-header-text h2 { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; color: #a78bfa; }
+  .s-header-text p { color: var(--muted); font-size: 0.93rem; line-height: 1.6; }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 22px 44px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .pill {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px; padding: 7px 14px; font-size: 0.82rem;
+  }
+  .pill strong { font-weight: 600; margin-right: 2px; }
+
+  .section-body { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 700px) {
+    .section-body { grid-template-columns: 1fr; }
+    .section-header, .meta-row, .purpose-col, .tip-col, .agenda-col, .agreements-body { padding-left: 22px !important; padding-right: 22px !important; }
+    .section-header { flex-direction: column; }
+    .purpose-col { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .agenda-col:first-child { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  }
+
+  .purpose-col { padding: 28px 44px; border-right: 1px solid rgba(255,255,255,0.06); }
+  .tip-col { padding: 28px 44px; }
+  .col-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 14px; color: #a78bfa; }
+  .purpose-col p { color: #cbd5e1; line-height: 1.8; font-size: 0.93rem; font-weight: 300; }
+
+  .tip-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 20px; }
+  .tip-box p { color: #94a3b8; line-height: 1.75; font-size: 0.88rem; font-weight: 300; }
+
+  /* Agenda two-column layout */
+  .agenda-body { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(255,255,255,0.06); }
+  @media (max-width: 700px) {
+    .agenda-body { grid-template-columns: 1fr; }
+    .agenda-col { padding-left: 22px !important; padding-right: 22px !important; }
+    .agenda-col:first-child { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  }
+  .agenda-col { padding: 28px 44px; }
+  .agenda-col:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+  .agenda-day-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+    color: #a78bfa; margin-bottom: 16px;
+  }
+  .agenda-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .agenda-step {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(167,139,250,0.15); color: #a78bfa;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .step-content strong { color: #e2e8f0; font-size: 0.88rem; display: block; margin-bottom: 3px; }
+  .step-content p { font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+  /* Working agreements layout */
+  .agreements-row { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px 44px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .agreements-why { padding: 20px 44px; border-bottom: 1px solid rgba(255,255,255,0.06); color: #cbd5e1; line-height: 1.8; font-size: 0.93rem; font-weight: 300; }
+
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 10px 14px; font-size: 0.87rem; color: #cbd5e1; line-height: 1.5;
+  }
+  .check-icon {
+    width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0; margin-top: 1px;
+    background: rgba(167,139,250,0.15); color: #a78bfa;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+  }
+  .checklist li strong { color: #e2e8f0; }
+
+  .rules-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .rule-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .rule-num {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(167,139,250,0.15); color: #a78bfa;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .rule-item p { font-size: 0.87rem; color: #cbd5e1; line-height: 1.6; }
+  .rule-item strong { color: #e2e8f0; }
+
+  /* Tips list */
+  .tips-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .tips-list li { font-size: 0.93rem; color: #cbd5e1; line-height: 1.8; font-weight: 300; }
+  .tips-list li strong { color: #e2e8f0; font-weight: 600; }
+
+  .callout-box {
+    background: rgba(167,139,250,0.07); border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 14px; padding: 18px 20px; margin-bottom: 14px;
+  }
+  .callout-box p { color: #94a3b8; line-height: 1.75; font-size: 0.88rem; font-weight: 300; }
+
+  .outcome {
+    margin-top: 16px; padding: 14px 18px; border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03);
+    font-size: 0.85rem; color: #94a3b8; line-height: 1.6;
+  }
+  .outcome strong { color: #a78bfa; display:block; font-size:10px; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+
+  footer {
+    position: relative; z-index:1; text-align: center;
+    padding: 40px 24px; border-top: 1px solid rgba(255,255,255,0.05);
+    color: var(--muted); font-size: 0.85rem; line-height: 2;
+  }
+  footer a { text-decoration: none; color: #a5b4fc; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="prog-wrap"><div class="prog-bar" id="pb"></div></div>
+
+<nav class="top-nav">
+  <a href="/agile-basics/" class="nav-logo"><span>Agile</span> Hub</a>
+  <div class="nav-links">
+    <a href="/agile-basics/#manifesto">Manifesto</a>
+    <a href="/agile-basics/agile-manifesto/">Principles</a>
+    <a href="/agile-basics/ceremonies/">Ceremonies</a>
+    <a href="/agile-basics/roles/">Responsibilities</a>
+  </div>
+</nav>
+
+<header>
+  <div class="eyebrow">Getting Started</div>
+  <h1>Team Kickoff &amp; Working Agreements</h1>
+  <p class="subtitle">Before your first sprint, your team needs one sprint to get aligned. Here's how to run it.</p>
+</header>
+
+<!-- 1. What is Sprint 0? -->
+<div class="section" id="sec-0">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="s-icon">🚀</div>
+      <div class="s-header-text">
+        <h2>Sprint 0</h2>
+        <p>Not a planning sprint — a setup sprint. The time your team spends aligning on how you'll work before you commit to what you'll build.</p>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="pill">👥 <strong>Who:</strong> Scrum Master + full team</div>
+      <div class="pill">📅 <strong>When:</strong> Before Sprint 1</div>
+      <div class="pill">⏱️ <strong>Duration:</strong> 1–2 days</div>
+      <div class="pill">🏗️ <strong>Framework:</strong> Scrum</div>
+    </div>
+    <div class="section-body">
+      <div class="purpose-col">
+        <div class="col-label">Purpose</div>
+        <p>Sprint 0 is not a planning sprint. It's a setup sprint — the time your team spends aligning on how you'll work before you commit to what you'll build. Skip it and you'll spend the first 3 sprints discovering misalignments that could have been resolved in a day.</p>
+        <p style="margin-top: 14px; color: #e2e8f0; font-size: 0.88rem; font-weight: 600;">What Sprint 0 IS:</p>
+        <p style="margin-top: 6px;">Establishing working agreements, building your DoD, configuring tools, running practice ceremonies, defining team norms.</p>
+        <p style="margin-top: 14px; color: #e2e8f0; font-size: 0.88rem; font-weight: 600;">What Sprint 0 is NOT:</p>
+        <p style="margin-top: 6px;">Delivering features, padding the backlog, writing every story for the next quarter.</p>
+      </div>
+      <div class="tip-col">
+        <div class="col-label">💡 Keep It Focused</div>
+        <div class="tip-box">
+          <p>Keep it short. One day for a co-located team, two days for distributed. The goal is alignment, not exhaustion. If you're still in Sprint 0 after a week, you've lost the plot.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Sprint 0 Agenda -->
+<div class="section" id="sec-1">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="s-icon">📋</div>
+      <div class="s-header-text">
+        <h2>A Two-Day Agenda</h2>
+        <p>A practical schedule for getting your team aligned and ready to ship — before Sprint 1 begins.</p>
+      </div>
+    </div>
+    <div class="agenda-body">
+      <div class="agenda-col">
+        <div class="agenda-day-label">Day 1 — Alignment</div>
+        <ul class="agenda-steps">
+          <li class="agenda-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Team introductions &amp; working styles (30 min)</strong>
+              <p>How does each person prefer to communicate? What's their working hours? How do they like to receive feedback?</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Roles &amp; responsibilities (45 min)</strong>
+              <p>Walk through each role's responsibilities. Use the roles page as a reference. Confirm who is playing what role.</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Draft working agreements (60 min)</strong>
+              <p>See the working agreements section below. Get the first version on paper.</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Tool setup &amp; access (60 min)</strong>
+              <p>Jira, Slack, GitHub, Confluence — make sure everyone has access and knows the conventions.</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <strong>Definition of Ready workshop (45 min)</strong>
+              <p>Build your DoR as a team. What makes a story ready to start?</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="agenda-col">
+        <div class="agenda-day-label">Day 2 — Process</div>
+        <ul class="agenda-steps">
+          <li class="agenda-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Definition of Done workshop (60 min)</strong>
+              <p>Build your DoD as a team. What makes a story done?</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Practice refinement (60 min)</strong>
+              <p>Run a real refinement session with backlog items. Use it to stress-test your DoR.</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Sprint 1 planning (90 min)</strong>
+              <p>Plan your first real sprint. Commit to a sprint goal.</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Retrospective on Sprint 0 (30 min)</strong>
+              <p>What worked in the setup process? What do you want to change before Sprint 1?</p>
+            </div>
+          </li>
+          <li class="agenda-step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <strong>Celebrate 🎉</strong>
+              <p>You have a team. That matters.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Working Agreements -->
+<div class="section" id="sec-2">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="s-icon">🤝</div>
+      <div class="s-header-text">
+        <h2>Working Agreements</h2>
+        <p>The rules your team sets for itself. Not imposed from above — negotiated together.</p>
+      </div>
+    </div>
+    <div class="agreements-why">
+      Working agreements are the explicit norms that prevent friction later. The conversations that feel awkward to have in Sprint 3 ("why does no one review PRs?") are easy to have in Sprint 0 when everything is hypothetical. Surface them early.
+    </div>
+    <div class="section-body">
+      <div class="purpose-col">
+        <div class="col-label">Topics to Cover</div>
+        <ul class="checklist">
+          <li><span class="check-icon">✓</span><span><strong>Core hours:</strong> when is everyone expected to be online/reachable?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Response time:</strong> how quickly should Slack/email messages be answered?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Code review:</strong> what's the turnaround SLA for PR reviews?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Meeting norms:</strong> cameras on/off? Agenda required? How do we handle being late?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Decision making:</strong> how do we make technical decisions? Who has final say?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Definition of blocked:</strong> what counts as a blocker? When do you raise it?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Feedback style:</strong> how direct is direct? How do we give feedback in retros?</span></li>
+          <li><span class="check-icon">✓</span><span><strong>Out of office:</strong> how much notice for planned absence? Who covers?</span></li>
+        </ul>
+      </div>
+      <div class="tip-col">
+        <div class="col-label">Rules for the Agreements Themselves</div>
+        <ul class="rules-list">
+          <li class="rule-item">
+            <div class="rule-num">1</div>
+            <p><strong>Everyone must agree</strong> — not just nod. If someone has reservations, surface them now.</p>
+          </li>
+          <li class="rule-item">
+            <div class="rule-num">2</div>
+            <p><strong>Write them down and post them somewhere visible</strong> — team wiki, Confluence, or the first page of your Jira project.</p>
+          </li>
+          <li class="rule-item">
+            <div class="rule-num">3</div>
+            <p><strong>Revisit in every retrospective</strong> — working agreements rot. Update them when reality changes.</p>
+          </li>
+          <li class="rule-item">
+            <div class="rule-num">4</div>
+            <p><strong>Violations get named, not ignored</strong> — "hey, that's not what we agreed" is a healthy conversation. Letting it slide erodes the agreements faster than the original violation.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. First Sprint Tips -->
+<div class="section" id="sec-3">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="s-icon">⚡</div>
+      <div class="s-header-text">
+        <h2>Making Sprint 1 Work</h2>
+        <p>Your first sprint sets the norms for everything that follows.</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="purpose-col">
+        <div class="col-label">Five Tips for Sprint 1</div>
+        <ul class="tips-list">
+          <li><strong>Undercommit deliberately.</strong> Sprint 1 velocity is unknown. Take 70% of what you think you can do. Finishing early is a better outcome than the first sprint ending in carry-over.</li>
+          <li><strong>Run every ceremony, even if it feels over-engineered.</strong> The team needs reps. Don't skip standup because "we're all in the same room." Muscle memory comes from repetition.</li>
+          <li><strong>Treat the retrospective as the most important ceremony.</strong> Sprint 1 will surface things that Sprint 0 didn't anticipate. The retro is where you fix them before they compound.</li>
+          <li><strong>Name your sprint goal out loud.</strong> At standup, reference it. At review, measure against it. The sprint goal is the team's shared commitment — not just a label on a board.</li>
+          <li><strong>Don't change the working agreements mid-sprint.</strong> Wait for the retro. Changes during a sprint undermine the agreements before they've had a chance to establish.</li>
+        </ul>
+      </div>
+      <div class="tip-col">
+        <div class="col-label">💡 Remember</div>
+        <div class="callout-box">
+          <p>The most important thing about Sprint 1 is finishing it — not what you finished. A team that ships something and holds a retrospective is ahead of a team that over-committed and carried half their backlog over.</p>
+        </div>
+        <div class="outcome">
+          <strong>Sprint 1 Outcome</strong>
+          A working team with a shared history, a retro with real feedback, and a velocity baseline for Sprint 2 planning.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>Built for agile teams &nbsp;·&nbsp; Part of <a href="/agile-basics/">Agile Hub</a></div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const el = document.documentElement;
+    const pct = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+    document.getElementById('pb').style.width = pct + '%';
+  });
+
+  const sections = document.querySelectorAll('.section');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+
+  sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
