@@ -24,7 +24,7 @@
     .prog-bar { height:100%; background: linear-gradient(90deg,#6366f1,#22d3ee,#f472b6); width:0%; transition:width .1s; }
 
     /* ── Nav ── */
-    nav {
+    nav:not(.nav-dots) {
       position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 48px;
@@ -36,7 +36,7 @@
     .nav-links { display: flex; gap: 32px; }
     .nav-links a { color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--text); }
-    @media (max-width: 600px) { nav { padding: 14px 20px; } .nav-links { gap: 16px; } }
+    @media (max-width: 600px) { nav:not(.nav-dots) { padding: 14px 20px; } .nav-links { gap: 16px; } }
 
     /* ── Side nav dots ── */
     .nav-dots {
