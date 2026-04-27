@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Role Responsibilities — Agile Hub</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0e1a; --card: #111827; --text: #e2e8f0; --muted: #64748b; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(99,102,241,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 85%, rgba(34,211,238,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 55% 50%, rgba(244,114,182,0.06) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Progress bar ── */
+    .prog-wrap { position: fixed; top:0; left:0; right:0; height:3px; background:rgba(255,255,255,0.05); z-index:200; }
+    .prog-bar { height:100%; background: linear-gradient(90deg,#6366f1,#22d3ee,#f472b6); width:0%; transition:width .1s; }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 3px; left: 0; right: 0; z-index: 150;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 48px;
+      background: rgba(10,14,26,0.7); backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; text-decoration: none; color: var(--text); }
+    .nav-logo span { background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a { color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    @media (max-width: 600px) { nav { padding: 14px 20px; } .nav-links { gap: 16px; } }
+
+    /* ── Side nav dots ── */
+    .nav-dots {
+      position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
+      z-index: 50; display: flex; flex-direction: column; gap: 10px;
+    }
+    .nav-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.2); cursor: pointer; border: none;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .nav-dot.active { background: #22d3ee; transform: scale(1.5); }
+
+    /* ── Header ── */
+    header { position: relative; z-index:1; text-align: center; padding: 110px 24px 56px; }
+    .eyebrow {
+      display: inline-block; font-size: 11px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+      color: #22d3ee; background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.25);
+      border-radius: 100px; padding: 6px 18px; margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(2.4rem,6vw,4.2rem); font-weight: 900; line-height: 1.1;
+      background: linear-gradient(135deg, #fff 30%, #6366f1 65%, #22d3ee 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 16px;
+    }
+    .subtitle { color: var(--muted); font-size:1.05rem; max-width:580px; margin:0 auto; line-height:1.7; }
+
+    /* ── Role tabs ── */
+    .role-tabs {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+      padding: 0 24px 52px;
+    }
+    .role-tab {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted); font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .role-tab:hover { background: rgba(255,255,255,0.09); color: var(--text); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .role-tab.active { color: var(--text); border-color: var(--rc); background: var(--rb); }
+    .tab-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rc); flex-shrink: 0; }
+
+    /* ── Section ── */
+    .section {
+      position: relative; z-index:1;
+      max-width: 1100px; margin: 0 auto 72px; padding: 0 24px;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .section.visible { opacity:1; transform:translateY(0); }
+    .section-inner { border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; background: var(--card); }
+
+    /* ── Role header ── */
+    .role-header {
+      padding: 36px 44px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .role-icon {
+      width: 64px; height: 64px; border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; flex-shrink: 0; background: var(--rb);
+    }
+    .role-header-text h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+    .role-header-text .tagline { color: var(--muted); font-size: 0.95rem; line-height: 1.65; max-width: 640px; }
+
+    /* ── Ceremonies attended ── */
+    .ceremonies-row {
+      padding: 22px 44px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    }
+    .row-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+    .ceremony-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 100px; padding: 6px 14px; font-size: 0.8rem; font-weight: 500; color: #cbd5e1;
+    }
+
+    /* ── Responsibilities grid ── */
+    .resp-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    @media (max-width: 700px) { .resp-grid { grid-template-columns: 1fr; } }
+    .resp-col { padding: 28px 44px; }
+    .resp-col:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+    .col-label { font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 16px; color: var(--rc); }
+
+    .resp-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .resp-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 13px 15px;
+    }
+    .resp-item-icon {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; background: var(--rb);
+    }
+    .resp-item-text strong { display: block; font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .resp-item-text span { font-size: 0.82rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    /* ── Mindset block ── */
+    .mindset-block {
+      padding: 28px 44px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mindset-inner {
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 24px 28px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .mindset-quote-mark { font-size: 4rem; line-height: 1; color: var(--rc); opacity: 0.4; flex-shrink: 0; margin-top: -10px; font-family: Georgia, serif; }
+    .mindset-text p { font-size: 1.02rem; color: #cbd5e1; line-height: 1.8; font-weight: 300; font-style: italic; }
+    .mindset-text .author { font-size: 0.82rem; color: var(--muted); margin-top: 10px; font-style: normal; }
+
+    /* ── Not your job ── */
+    .not-your-job {
+      padding: 28px 44px 36px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nyj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .nyj-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(251,113,133,0.05); border: 1px solid rgba(251,113,133,0.18);
+      border-radius: 12px; padding: 13px 15px;
+    }
+    .nyj-x { width: 22px; height: 22px; border-radius: 50%; background: rgba(251,113,133,0.15); color: #fb7185; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .nyj-item span { font-size: 0.84rem; color: #94a3b8; line-height: 1.55; font-weight: 300; }
+
+    /* ── RACI row ── */
+    .raci-wrap { padding: 28px 44px 36px; }
+    .raci-label-row { display: flex; justify-content: flex-end; gap: 0; margin-bottom: 8px; padding-right: 4px; }
+    .raci-h { width: 44px; text-align: center; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .raci-row { display: flex; align-items: center; border-radius: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); gap: 0; }
+    .raci-row:last-child { border-bottom: none; }
+    .raci-name { flex: 1; font-size: 0.87rem; color: #cbd5e1; font-weight: 400; }
+    .raci-cell { width: 44px; text-align: center; }
+    .raci-dot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%; font-size: 10px; font-weight: 700;
+    }
+    .raci-r { background: rgba(99,102,241,0.18); color: #a5b4fc; }
+    .raci-a { background: rgba(244,114,182,0.18); color: #f9a8d4; }
+    .raci-c { background: rgba(251,191,36,0.18); color: #fde68a; }
+    .raci-i { background: rgba(255,255,255,0.07); color: var(--muted); }
+    .raci-legend { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+    .raci-leg { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); }
+
+    /* ── Footer ── */
+    footer { position: relative; z-index:1; text-align: center; padding: 48px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: var(--muted); font-size: 0.85rem; line-height: 2; }
+    footer a { color: #a5b4fc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── Mobile ── */
+    @media (max-width: 700px) {
+      .role-header, .ceremonies-row, .resp-col, .mindset-block, .not-your-job, .raci-wrap { padding-left: 22px !important; padding-right: 22px !important; }
+      .role-header { flex-direction: column; }
+      .resp-col:first-child { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    }
+
+    /* Color variants */
+    .r-sm { --rc: #6366f1; --rb: rgba(99,102,241,0.13); }
+    .r-dev { --rc: #22d3ee; --rb: rgba(34,211,238,0.12); }
+    .r-po  { --rc: #fbbf24; --rb: rgba(251,191,36,0.12); }
+    .r-qa  { --rc: #f472b6; --rb: rgba(244,114,182,0.12); }
+    .r-sh  { --rc: #34d399; --rb: rgba(52,211,153,0.12); }
+  </style>
+</head>
+<body>
+  <div class="prog-wrap"><div class="prog-bar" id="pb"></div></div>
+
+  <nav>
+    <a href="/agile-basics/" class="nav-logo"><span>Agile</span> Hub</a>
+    <div class="nav-links">
+      <a href="/agile-basics/#manifesto">Manifesto</a>
+      <a href="/agile-basics/agile-manifesto/">Principles</a>
+      <a href="/agile-basics/ceremonies/">Ceremonies</a>
+      <a href="/agile-basics/roles/" class="active">Responsibilities</a>
+    </div>
+  </nav>
+
+  <nav class="nav-dots" id="navDots">
+    <button class="nav-dot active" title="Top" onclick="scrollToSection(-1)"></button>
+    <button class="nav-dot" title="Scrum Master" onclick="scrollToSection(0)"></button>
+    <button class="nav-dot" title="Developer" onclick="scrollToSection(1)"></button>
+    <button class="nav-dot" title="Product Owner" onclick="scrollToSection(2)"></button>
+    <button class="nav-dot" title="QA / Tester" onclick="scrollToSection(3)"></button>
+    <button class="nav-dot" title="Stakeholder" onclick="scrollToSection(4)"></button>
+    <button class="nav-dot" title="RACI" onclick="scrollToSection(5)"></button>
+  </nav>
+
+  <header>
+    <div class="eyebrow">Agile Team Roles</div>
+    <h1>Who Does What<br>& Why It Matters</h1>
+    <p class="subtitle">Clear role boundaries remove friction. Each person on an agile team has a distinct set of responsibilities — here's what that looks like in practice.</p>
+  </header>
+
+  <!-- Role quick-jump tabs -->
+  <div class="role-tabs">
+    <button class="role-tab r-sm active" onclick="scrollToSection(0)" style="--rc:#6366f1;--rb:rgba(99,102,241,0.13)">
+      <span class="tab-dot"></span> Scrum Master
+    </button>
+    <button class="role-tab r-dev" onclick="scrollToSection(1)" style="--rc:#22d3ee;--rb:rgba(34,211,238,0.12)">
+      <span class="tab-dot"></span> Developer
+    </button>
+    <button class="role-tab r-po" onclick="scrollToSection(2)" style="--rc:#fbbf24;--rb:rgba(251,191,36,0.12)">
+      <span class="tab-dot"></span> Product Owner
+    </button>
+    <button class="role-tab r-qa" onclick="scrollToSection(3)" style="--rc:#f472b6;--rb:rgba(244,114,182,0.12)">
+      <span class="tab-dot"></span> QA / Tester
+    </button>
+    <button class="role-tab r-sh" onclick="scrollToSection(4)" style="--rc:#34d399;--rb:rgba(52,211,153,0.12)">
+      <span class="tab-dot"></span> Stakeholder
+    </button>
+    <button class="role-tab" onclick="scrollToSection(5)" style="--rc:#94a3b8;--rb:rgba(148,163,184,0.1);color:var(--muted)">
+      <span class="tab-dot" style="background:#64748b"></span> RACI Matrix
+    </button>
+  </div>
+
+  <!-- ── 1. Scrum Master ── -->
+  <div class="section r-sm" id="sec-0">
+    <div class="section-inner">
+      <div class="role-header">
+        <div class="role-icon">🧭</div>
+        <div class="role-header-text">
+          <h2 style="color:#6366f1">Scrum Master</h2>
+          <p class="tagline">The team's coach and guardian of the process. The Scrum Master serves the team — not manages it. Their success is measured by how little the team needs them over time.</p>
+        </div>
+      </div>
+
+      <div class="ceremonies-row">
+        <span class="row-label">Ceremonies</span>
+        <span class="ceremony-pill">📋 Sprint Planning — Facilitator</span>
+        <span class="ceremony-pill">☀️ Daily Stand-up — Facilitator</span>
+        <span class="ceremony-pill">🗂️ Refinement — Facilitator</span>
+        <span class="ceremony-pill">🎯 Sprint Review — Facilitator</span>
+        <span class="ceremony-pill">🔍 Retrospective — Facilitator + participant</span>
+      </div>
+
+      <div class="resp-grid">
+        <div class="resp-col">
+          <div class="col-label">Core responsibilities</div>
+          <ul class="resp-list">
+            <li class="resp-item">
+              <div class="resp-item-icon">🗓️</div>
+              <div class="resp-item-text">
+                <strong>Facilitate all ceremonies</strong>
+                <span>Own the scheduling, format, and timebox for all 7 Scrum events. Adjust formats to keep them effective as the team matures.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🚧</div>
+              <div class="resp-item-text">
+                <strong>Remove impediments fast</strong>
+                <span>Any blocker raised should be actioned within 24 hours. Escalate systemic blockers upward — don't let them fester in the backlog.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🛡️</div>
+              <div class="resp-item-text">
+                <strong>Protect the team's focus</strong>
+                <span>Shield the team from external interruptions, scope creep, and ad-hoc requests during a sprint. The sprint commitment is sacred.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📚</div>
+              <div class="resp-item-text">
+                <strong>Coach agile principles</strong>
+                <span>Teach by doing. When the team breaks agile principles, pause and explain the "why" — not just the "what to do instead."</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📊</div>
+              <div class="resp-item-text">
+                <strong>Track sprint health</strong>
+                <span>Monitor velocity, burndown, and team sentiment. Spot trends — not just snapshots — and raise concerns proactively.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="resp-col">
+          <div class="col-label">Not your job</div>
+          <div class="nyj-grid" style="grid-template-columns:1fr;">
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Assign tasks.</strong> The team self-organises and pulls work from the sprint backlog. Task assignment is a command-and-control anti-pattern.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Make product decisions.</strong> The PO owns the backlog priority. The SM doesn't decide what gets built or in what order.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Report to management.</strong> You serve the team — not translate them for leadership. Progress visibility goes through the PO and sprint reviews.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Own the code or architecture.</strong> Technical quality is the team's shared responsibility. The SM doesn't hold veto power over technical decisions.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mindset-block">
+        <div class="mindset-inner">
+          <div class="mindset-quote-mark">"</div>
+          <div class="mindset-text">
+            <p>The best Scrum Masters are invisible when everything's working. Their real work shows up in the absence of problems — ceremonies that run themselves, teams that surface blockers early, and retros where people actually say what they think.</p>
+            <div class="author">— Servant-leader principle</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Developer ── -->
+  <div class="section r-dev" id="sec-1">
+    <div class="section-inner">
+      <div class="role-header">
+        <div class="role-icon">💻</div>
+        <div class="role-header-text">
+          <h2 style="color:#22d3ee">Developer</h2>
+          <p class="tagline">Builders of working software. Developers own the technical quality of the sprint and self-organise to meet commitments. In agile, "developer" covers all disciplines building the product — engineers, designers, analysts.</p>
+        </div>
+      </div>
+
+      <div class="ceremonies-row">
+        <span class="row-label">Ceremonies</span>
+        <span class="ceremony-pill">📋 Sprint Planning — Estimator</span>
+        <span class="ceremony-pill">☀️ Daily Stand-up — Peer update</span>
+        <span class="ceremony-pill">🗂️ Refinement — Estimator & clarifier</span>
+        <span class="ceremony-pill">🧩 Decomposition — Lead contributor</span>
+        <span class="ceremony-pill">🎯 Sprint Review — Demo owner</span>
+        <span class="ceremony-pill">🔍 Retrospective — Participant</span>
+      </div>
+
+      <div class="resp-grid">
+        <div class="resp-col">
+          <div class="col-label">Core responsibilities</div>
+          <ul class="resp-list">
+            <li class="resp-item">
+              <div class="resp-item-icon">🎯</div>
+              <div class="resp-item-text">
+                <strong>Self-organise around the sprint goal</strong>
+                <span>Pull work from the board — don't wait to be assigned. All decisions about how to meet the sprint commitment are the team's to make.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📏</div>
+              <div class="resp-item-text">
+                <strong>Own estimates honestly</strong>
+                <span>Estimates belong to the team, not the PO or SM. Never let estimates be negotiated down by pressure. Surface uncertainty explicitly.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">✅</div>
+              <div class="resp-item-text">
+                <strong>Meet the Definition of Done</strong>
+                <span>A story isn't done until it meets every criterion — including tests, code review, and documentation. "Done-ish" ships bugs, not features.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🔊</div>
+              <div class="resp-item-text">
+                <strong>Raise blockers immediately</strong>
+                <span>Surface blockers at stand-up the day they appear — not at sprint review. The team exists to swarm on blockers. Use it.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">⚙️</div>
+              <div class="resp-item-text">
+                <strong>Maintain technical excellence</strong>
+                <span>Continuous refactoring, green CI, prompt code reviews, and explicit tech-debt tracking in the backlog. Quality is not a separate phase.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="resp-col">
+          <div class="col-label">Not your job</div>
+          <div class="nyj-grid" style="grid-template-columns:1fr;">
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Commit to impossible timelines.</strong> If a deadline is unrealistic, say so in planning — not mid-sprint or at review.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Gold-plate.</strong> Build to the acceptance criteria, not to a personal ideal of perfection. Simplicity is an agile principle.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Pick new work before swarming blocked stories.</strong> A team ships faster when the board flows — not when individuals are always individually busy.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Accept scope changes mid-sprint without flagging them.</strong> Any change to agreed sprint work must surface immediately to the SM and PO.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mindset-block">
+        <div class="mindset-inner">
+          <div class="mindset-quote-mark">"</div>
+          <div class="mindset-text">
+            <p>Working software is the primary measure of progress. Not story points completed, not tasks ticked off, not features in staging. Software in users' hands that solves their problem. Everything else is a proxy.</p>
+            <div class="author">— Agile Principle 7</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Product Owner ── -->
+  <div class="section r-po" id="sec-2">
+    <div class="section-inner">
+      <div class="role-header">
+        <div class="role-icon">📋</div>
+        <div class="role-header-text">
+          <h2 style="color:#fbbf24">Product Owner</h2>
+          <p class="tagline">The single voice of the customer. The PO owns the backlog, defines what gets built and in what order, and is the team's primary interface with business reality. One PO — not a committee.</p>
+        </div>
+      </div>
+
+      <div class="ceremonies-row">
+        <span class="row-label">Ceremonies</span>
+        <span class="ceremony-pill">📋 Sprint Planning — Backlog presenter</span>
+        <span class="ceremony-pill">☀️ Daily Stand-up — Optional observer</span>
+        <span class="ceremony-pill">🗂️ Refinement — Lead presenter</span>
+        <span class="ceremony-pill">💧 Story Hydration — PM seat (Three Amigos)</span>
+        <span class="ceremony-pill">🎯 Sprint Review — Host & acceptance lead</span>
+        <span class="ceremony-pill">🔍 Retrospective — Participant</span>
+      </div>
+
+      <div class="resp-grid">
+        <div class="resp-col">
+          <div class="col-label">Core responsibilities</div>
+          <ul class="resp-list">
+            <li class="resp-item">
+              <div class="resp-item-icon">📌</div>
+              <div class="resp-item-text">
+                <strong>Own and maintain the backlog</strong>
+                <span>Keep 2–3 sprints of refined, clearly-defined, prioritised stories ready at all times. A backlog that's always behind causes planning chaos.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📝</div>
+              <div class="resp-item-text">
+                <strong>Write testable acceptance criteria</strong>
+                <span>Every story entering refinement must have AC the team can estimate against and QA can test. Vague AC ships ambiguity.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🔢</div>
+              <div class="resp-item-text">
+                <strong>Prioritise ruthlessly by value</strong>
+                <span>Sequence the backlog by business value, risk, and dependency — not by who asked loudest. Own and explain prioritisation decisions.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">⚡</div>
+              <div class="resp-item-text">
+                <strong>Be available daily</strong>
+                <span>Answer clarifying questions within 4 hours. Unavailable POs cause the team to make assumptions. Wrong assumptions become costly rework.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🎬</div>
+              <div class="resp-item-text">
+                <strong>Accept or reject completed work</strong>
+                <span>Review completed stories promptly. Acceptance against AC closes the story. Rejection must include specific, actionable feedback.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="resp-col">
+          <div class="col-label">Not your job</div>
+          <div class="nyj-grid" style="grid-template-columns:1fr;">
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Estimate stories.</strong> The team estimates. The PO provides clarity — not effort guesses. PO estimates undermine team ownership.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Change sprint scope mid-sprint.</strong> Committed sprint work is off-limits. New priorities go on the backlog for next sprint.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Negotiate estimates down.</strong> "Can we do it in 3 points instead of 5?" is not a product conversation. Estimates are the team's honest forecast.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Design or dictate technical solutions.</strong> The PO defines the what and why. The team decides the how.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mindset-block">
+        <div class="mindset-inner">
+          <div class="mindset-quote-mark">"</div>
+          <div class="mindset-text">
+            <p>Customer collaboration over contract negotiation. The PO is that collaboration made permanent — a full-time representative of what the customer actually needs, constantly prioritising the team's effort toward real value.</p>
+            <div class="author">— Agile Manifesto, Value 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. QA / Tester ── -->
+  <div class="section r-qa" id="sec-3">
+    <div class="section-inner">
+      <div class="role-header">
+        <div class="role-icon">🔬</div>
+        <div class="role-header-text">
+          <h2 style="color:#f472b6">QA / Tester</h2>
+          <p class="tagline">The team's quality conscience. In agile, quality is not a gate at the end — it's designed in from the start. The QA shifts left: reviewing requirements, writing test cases, and automating before a line of code is written.</p>
+        </div>
+      </div>
+
+      <div class="ceremonies-row">
+        <span class="row-label">Ceremonies</span>
+        <span class="ceremony-pill">🗂️ Refinement — AC reviewer</span>
+        <span class="ceremony-pill">💧 Story Hydration — Quality Lead (Three Amigos)</span>
+        <span class="ceremony-pill">🧩 Decomposition — Test task author</span>
+        <span class="ceremony-pill">☀️ Daily Stand-up — Peer update</span>
+        <span class="ceremony-pill">🎯 Sprint Review — Gatekeeper</span>
+        <span class="ceremony-pill">🔍 Retrospective — Participant</span>
+      </div>
+
+      <div class="resp-grid">
+        <div class="resp-col">
+          <div class="col-label">Core responsibilities</div>
+          <ul class="resp-list">
+            <li class="resp-item">
+              <div class="resp-item-icon">🔍</div>
+              <div class="resp-item-text">
+                <strong>Review AC before development starts</strong>
+                <span>Flag untestable, ambiguous, or incomplete acceptance criteria in hydration — before a developer picks up the story. This is your earliest and cheapest quality gate.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📄</div>
+              <div class="resp-item-text">
+                <strong>Write test cases alongside decomposition</strong>
+                <span>Test cases should be ready when development starts — not after it ends. Include edge cases, negative paths, and performance considerations.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🤖</div>
+              <div class="resp-item-text">
+                <strong>Automate regression coverage</strong>
+                <span>Automation is part of the story — not a separate project. Prioritise automation for high-regression risk paths. Add automation tasks explicitly in decomposition.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🚫</div>
+              <div class="resp-item-text">
+                <strong>Gate the sprint review</strong>
+                <span>Nothing gets demoed that hasn't passed your testing. Incomplete or failing work doesn't count as done — regardless of how late in the sprint it is.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🤝</div>
+              <div class="resp-item-text">
+                <strong>Pair with developers on edge cases</strong>
+                <span>QA isn't an adversary — it's a collaborator. Work alongside developers during implementation to catch issues before they're committed.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="resp-col">
+          <div class="col-label">Not your job</div>
+          <div class="nyj-grid" style="grid-template-columns:1fr;">
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Test at the end of the sprint only.</strong> Waterfall QA happens last. Agile QA happens throughout. Testing concurrent with development is the standard.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Accept vague acceptance criteria.</strong> "The page should feel fast" is not testable. Push for measurable criteria before the story starts.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Automate everything on day one.</strong> Prioritise automation strategically — regression-heavy paths first. Exploratory tests don't all need automation.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Let developers skip tests to meet deadlines.</strong> Tests are in the Definition of Done. A story without tests isn't done — it's deferred debt.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mindset-block">
+        <div class="mindset-inner">
+          <div class="mindset-quote-mark">"</div>
+          <div class="mindset-text">
+            <p>Continuous attention to technical excellence and good design enhances agility. Quality isn't a function of testing — it's a consequence of the entire team treating excellence as a shared standard, from the first line of AC to the last line of code.</p>
+            <div class="author">— Agile Principle 9</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Stakeholder ── -->
+  <div class="section r-sh" id="sec-4">
+    <div class="section-inner">
+      <div class="role-header">
+        <div class="role-icon">👔</div>
+        <div class="role-header-text">
+          <h2 style="color:#34d399">Stakeholder</h2>
+          <p class="tagline">Direction-setters and feedback-givers. Stakeholders provide the "why" — business priorities, funding, and real-world context. Agile works best when stakeholders engage through the right channels and trust the team to execute.</p>
+        </div>
+      </div>
+
+      <div class="ceremonies-row">
+        <span class="row-label">Ceremonies</span>
+        <span class="ceremony-pill">🎯 Sprint Review — Invited guest & feedback provider</span>
+        <span class="ceremony-pill">🗂️ Backlog input — Indirect, via PO</span>
+      </div>
+
+      <div class="resp-grid">
+        <div class="resp-col">
+          <div class="col-label">Core responsibilities</div>
+          <ul class="resp-list">
+            <li class="resp-item">
+              <div class="resp-item-icon">🎯</div>
+              <div class="resp-item-text">
+                <strong>Attend sprint reviews and give specific feedback</strong>
+                <span>This is your primary touchpoint. Come prepared with concrete reactions — not vague impressions. "Not what I imagined" starts the right conversation; it doesn't end it.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">📬</div>
+              <div class="resp-item-text">
+                <strong>Channel all requests through the Product Owner</strong>
+                <span>The PO is the single entry point for new work. This protects the team's focus and ensures priorities are weighed consistently.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">⚡</div>
+              <div class="resp-item-text">
+                <strong>Make decisions promptly when escalated</strong>
+                <span>When the PO escalates a decision that needs your input, respond quickly. Delayed decisions become blocked stories.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🏆</div>
+              <div class="resp-item-text">
+                <strong>Celebrate shipped work</strong>
+                <span>Acknowledging team accomplishments at review builds morale and signals that the work matters. It costs nothing and compounds over time.</span>
+              </div>
+            </li>
+            <li class="resp-item">
+              <div class="resp-item-icon">🤝</div>
+              <div class="resp-item-text">
+                <strong>Trust the team's estimates</strong>
+                <span>Velocity and estimates belong to the team. Pressuring for faster output leads to inflated estimates and hidden shortcuts — not actual speed.</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="resp-col">
+          <div class="col-label">Not your job</div>
+          <div class="nyj-grid" style="grid-template-columns:1fr;">
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Talk to developers directly about new features.</strong> Going around the PO fragments priorities and disrupts the team's sprint commitment.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Demand mid-sprint changes.</strong> Committed sprint work is off-limits. New priorities go into the backlog and are prioritised by the PO for the next sprint.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Use velocity as a performance metric.</strong> Velocity is a capacity planning tool — not a scorecard. Comparing velocity across sprints or teams is misleading.</span></div>
+            <div class="nyj-item"><div class="nyj-x">✕</div><span><strong style="color:#fb7185">Skip sprint reviews and ask for written summaries instead.</strong> The review is the feedback loop. Absent stakeholders break the inspect-and-adapt cycle.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mindset-block">
+        <div class="mindset-inner">
+          <div class="mindset-quote-mark">"</div>
+          <div class="mindset-text">
+            <p>Responding to change over following a plan. Stakeholders who embrace this value become agile accelerators — providing fast, specific feedback and trusting the team to adapt. Those who don't become the biggest source of friction in agile transformations.</p>
+            <div class="author">— Agile Manifesto, Value 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. RACI Matrix ── -->
+  <div class="section" id="sec-5" style="--rc:#94a3b8;--rb:rgba(148,163,184,0.08)">
+    <div class="section-inner">
+      <div class="role-header" style="border-color:rgba(255,255,255,0.06)">
+        <div class="role-icon" style="background:rgba(148,163,184,0.1)">📊</div>
+        <div class="role-header-text">
+          <h2 style="color:#94a3b8">RACI Matrix</h2>
+          <p class="tagline">Who is Responsible, Accountable, Consulted, and Informed for each key activity across the sprint lifecycle.</p>
+        </div>
+      </div>
+
+      <div class="raci-wrap">
+        <div class="raci-legend">
+          <div class="raci-leg"><div class="raci-dot raci-r" style="width:20px;height:20px">R</div> Responsible — does the work</div>
+          <div class="raci-leg"><div class="raci-dot raci-a" style="width:20px;height:20px">A</div> Accountable — owns the outcome</div>
+          <div class="raci-leg"><div class="raci-dot raci-c" style="width:20px;height:20px">C</div> Consulted — provides input</div>
+          <div class="raci-leg"><div class="raci-dot raci-i" style="width:20px;height:20px">I</div> Informed — kept in the loop</div>
+        </div>
+
+        <div class="raci-label-row">
+          <div class="raci-h">SM</div>
+          <div class="raci-h">DEV</div>
+          <div class="raci-h">PO</div>
+          <div class="raci-h">QA</div>
+          <div class="raci-h">SH</div>
+        </div>
+
+        <!-- rows: name, SM, DEV, PO, QA, SH -->
+        <div class="raci-row"><span class="raci-name">Maintain & prioritise the product backlog</span><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-a" style="background:rgba(244,114,182,0.18);color:#f9a8d4">A</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Write acceptance criteria</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-c" style="background:rgba(244,114,182,0.18);color:#f9a8d4">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Facilitate ceremonies</span><div class="raci-cell"><div class="raci-dot raci-r" style="background:rgba(99,102,241,0.18);color:#a5b4fc">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Story estimation</span><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Story hydration (Three Amigos)</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Task decomposition</span><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Remove impediments</span><div class="raci-cell"><div class="raci-dot raci-r" style="background:rgba(99,102,241,0.18);color:#a5b4fc">R</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Sprint commitment decision</span><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Build working software</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Test & validate stories</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Accept or reject completed work</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Retrospective action items</span><div class="raci-cell"><div class="raci-dot raci-r" style="background:rgba(99,102,241,0.18);color:#a5b4fc">R</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div></div>
+
+        <div class="raci-row"><span class="raci-name">Stakeholder feedback & direction</span><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-c">C</div></div><div class="raci-cell"><div class="raci-dot raci-i">I</div></div><div class="raci-cell"><div class="raci-dot raci-r">R</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>Built for agile teams &nbsp;·&nbsp; Part of <a href="/agile-basics/">Agile Hub</a></div>
+    <div style="margin-top:8px">Manifesto © 2001 <a href="https://agilemanifesto.org" target="_blank">the authors</a> &nbsp;·&nbsp; Retromat via <a href="https://retromat.org/en/" target="_blank">retromat.org</a></div>
+  </footer>
+
+  <script>
+    window.addEventListener('scroll', () => {
+      const el = document.documentElement;
+      document.getElementById('pb').style.width = (el.scrollTop / (el.scrollHeight - el.clientHeight) * 100) + '%';
+    });
+
+    function scrollToSection(i) {
+      if (i < 0) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+      document.getElementById('sec-' + i).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    const sections = document.querySelectorAll('.section');
+    const dots = document.querySelectorAll('.nav-dot');
+
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          const idx = Array.from(sections).indexOf(e.target);
+          dots.forEach((d, i) => d.classList.toggle('active', i === idx + 1));
+        }
+      });
+    }, { threshold: 0.1 });
+
+    sections.forEach(s => obs.observe(s));
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY < 150) dots.forEach((d, i) => d.classList.toggle('active', i === 0));
+    });
+  </script>
+</body>
+</html>
